@@ -1,12 +1,28 @@
-import '/../themes/app_themes.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inspection_station/data/data.dart';
+import 'package:inspection_station/injections/bloc_injections.dart';
+import '/../themes/app_themes.dart';
 import 'package:flutter/material.dart';
+import 'data/services/local_storage_services/local_storage_services.dart';
+import 'firebase_options.dart';
 import 'utils/constants/app_strings.dart';
 import 'utils/routes/app_routes.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  setUrlStrategy(PathUrlStrategy());
+  initializeFirebase();
   runApp(const MyApp());
+}
+
+void initializeFirebase() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseCrashlyticsService.initialize();
+  await LocalStorageService.instance.init();
 }
 
 class MyApp extends StatelessWidget {
@@ -14,14 +30,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: appStrings.lblAppName,
-      theme: appTheme.lightTheme,
-      themeMode: ThemeMode.light,
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.splash,
-      routes: getAllRoutes(),
-     
+    return MultiBlocProvider(
+      providers: getAllBlocProviders(),
+      child: MaterialApp(
+        title: appStrings.lblAppName,
+        theme: appTheme.lightTheme,
+        themeMode: ThemeMode.light,
+        debugShowCheckedModeBanner: false,
+        initialRoute: AppRoutes.splash,
+        routes: getAllRoutes(),
+      ),
     );
   }
 }

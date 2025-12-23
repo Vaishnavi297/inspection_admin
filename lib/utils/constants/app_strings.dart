@@ -21,4 +21,7 @@ class AppStrings {
   String get lblEnterUserName => "Enter your Username";
 
   String get lblEnterPassword => "Enter your Password";
+
+  String get lblCounty => "County";
+   String get lblCountyManagement => "County Management";
 }

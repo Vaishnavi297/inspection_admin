@@ -6,6 +6,17 @@ import 'package:inspection_station/utils/constants/app_colors.dart';
 import 'package:inspection_station/utils/constants/app_dimension.dart';
 import 'package:inspection_station/utils/common/decoration.dart';
 
+double _calcStatCardWidth(BuildContext context) {
+  final isLarge = ResponsiveWidget.isLargeScreen(context);
+  final isMedium = ResponsiveWidget.isMediumScreen(context);
+  final columns = isLarge ? 4 : (isMedium ? 2 : 1);
+  final sidebar = (isLarge || isMedium) ? (isLarge ? 300.0 : 80.0) : 0.0;
+  final horizontalPadding = isLarge ? s.s16 * 2 : (isMedium ? s.s128 * 2 : s.s12 * 2);
+  final spacing = isLarge ? s.s18 : (isMedium ? 16.0 : 12.0);
+  final total = MediaQuery.of(context).size.width - sidebar - horizontalPadding - spacing * (columns - 1);
+  return total / columns;
+}
+
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
@@ -54,29 +65,27 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appColors.backgroundColor,
-      body: SafeArea(
-        child: ResponsiveWidget(
-          largeScreen: _DashboardLarge(
-            header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
-            stats: _stats,
-            activities: _activities,
-            stations: _stations,
-            systemStatuses: _systemStatuses,
-          ),
-          mediumScreen: _DashboardLarge(
-            header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
-            stats: _stats,
-            activities: _activities,
-            stations: _stations,
-            systemStatuses: _systemStatuses,
-          ),
-          smallScreen: _DashboardLarge(
-            header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
-            stats: _stats,
-            activities: _activities,
-            stations: _stations,
-            systemStatuses: _systemStatuses,
-          ),
+      body: ResponsiveWidget(
+        largeScreen: _DashboardLarge(
+          header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
+          stats: _stats,
+          activities: _activities,
+          stations: _stations,
+          systemStatuses: _systemStatuses,
+        ),
+        mediumScreen: _DashboardLarge(
+          header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
+          stats: _stats,
+          activities: _activities,
+          stations: _stations,
+          systemStatuses: _systemStatuses,
+        ),
+        smallScreen: _DashboardLarge(
+          header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
+          stats: _stats,
+          activities: _activities,
+          stations: _stations,
+          systemStatuses: _systemStatuses,
         ),
       ),
     );
@@ -129,24 +138,40 @@ class _DashboardLarge extends StatelessWidget {
             children: stats.map((e) => _StatCard(data: e)).toList(),
           ),
           SizedBox(height: s.s16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _SectionCard(
-                  title: 'Recent Activity',
-                  child: _ActivityList(items: activities),
+          ResponsiveWidget.isSmallScreen(context)
+              ? Column(
+                  spacing: s.s8,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionCard(
+                      title: 'Recent Activity',
+                      child: _ActivityList(items: activities),
+                    ),
+                    SizedBox(width: s.s16),
+                    _SectionCard(
+                      title: 'Top Performing Stations',
+                      child: _TopStations(items: stations),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _SectionCard(
+                        title: 'Recent Activity',
+                        child: _ActivityList(items: activities),
+                      ),
+                    ),
+                    SizedBox(width: s.s16),
+                    Expanded(
+                      child: _SectionCard(
+                        title: 'Top Performing Stations',
+                        child: _TopStations(items: stations),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(width: s.s16),
-              Expanded(
-                child: _SectionCard(
-                  title: 'Top Performing Stations',
-                  child: _TopStations(items: stations),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -191,7 +216,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: (MediaQuery.of(context).size.width - (s.s128 + s.s128 + 18 + 18 + 18)) / 4,
+      width: _calcStatCardWidth(context),
       decoration: boxDecorationWithRoundedCorners(
         borderRadius: BorderRadius.circular(16),
         backgroundColor: appColors.surfaceColor,
@@ -288,20 +313,6 @@ class _ActivityList extends StatelessWidget {
   }
 }
 
-class _QuickActions extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _ActionTile(icon: Icons.add_business, label: 'Add New Station'),
-        _ActionTile(icon: Icons.person_add_alt_1, label: 'Add New Inspector'),
-        _ActionTile(icon: Icons.insert_chart_outlined, label: 'Generate Report'),
-        _ActionTile(icon: Icons.remove_red_eye_outlined, label: 'View All Inspections'),
-      ],
-    );
-  }
-}
-
 class _TopStations extends StatelessWidget {
   final List<_StationData> items;
   const _TopStations({required this.items});
@@ -348,64 +359,6 @@ class _TopStations extends StatelessWidget {
   }
 }
 
-class _SystemStatus extends StatelessWidget {
-  final List<_StatusData> items;
-  const _SystemStatus({required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: items
-          .map(
-            (e) => Padding(
-              padding: EdgeInsets.only(bottom: s.s8),
-              child: Row(
-                children: [
-                  _Dot(ok: e.ok),
-                  SizedBox(width: s.s8),
-                  Expanded(
-                    child: Text(
-                      e.label,
-                      style: GoogleFonts.ptSans(fontSize: FontSize.s14, color: appColors.primaryTextColor),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-}
-
-class _ActionTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _ActionTile({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: s.s12),
-      decoration: BoxDecoration(color: appColors.textGreyColor, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Container(
-          height: 36,
-          width: 36,
-          decoration: BoxDecoration(color: appColors.primaryColor.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: appColors.primaryColor),
-        ),
-        title: Text(
-          label,
-          style: GoogleFonts.ptSans(fontSize: FontSize.s14, color: appColors.primaryTextColor),
-        ),
-        trailing: Icon(Icons.chevron_right, color: appColors.secondaryTextColor),
-        onTap: () {},
-      ),
-    );
-  }
-}
-
 class _StatusIcon extends StatelessWidget {
   final _ActivityStatus status;
   const _StatusIcon({required this.status});
@@ -418,20 +371,6 @@ class _StatusIcon extends StatelessWidget {
       padding: EdgeInsets.all(s.s8),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
       child: Icon(icon, color: color, size: 20),
-    );
-  }
-}
-
-class _Dot extends StatelessWidget {
-  final bool ok;
-  const _Dot({required this.ok});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 10,
-      width: 10,
-      decoration: BoxDecoration(color: ok ? appColors.green : appColors.red, shape: BoxShape.circle),
     );
   }
 }

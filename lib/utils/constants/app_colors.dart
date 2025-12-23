@@ -16,6 +16,7 @@ class AppColors {
   Color whiteTextColor = const Color(0xFFFFFFFF);
   Color btnWhiteTextColor = const Color(0xFFFFFFFF);
   Color textGreyColor = const Color(0xFFF3F4F6);
+  Color dataTableHeaderColor = const Color(0xFFF8FAFC);
 
   //static colors
   Color red = Colors.red;
@@ -28,4 +29,5 @@ class AppColors {
   Color gray = Colors.grey;
   Color black = Colors.black;
   Color white = Colors.white;
+  Color transparent = Colors.transparent;
 }

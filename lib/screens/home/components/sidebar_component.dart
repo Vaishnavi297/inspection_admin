@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
+import 'package:inspection_station/utils/constants/app_strings.dart';
 
 import '../../../components/app_text_style/app_text_style.dart';
+import '../../../components/app_dialog/app_custom_dialog.dart';
+import '../../../data/services/local_storage_services/local_storage_services.dart';
 import '../../../utils/common/responsive_widget.dart';
 import '../../../utils/constants/app_assets.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/constants/app_dimension.dart';
+import '../../../data/repositories/admin_repository/admin_repository.dart';
+import '../../../utils/routes/app_routes.dart';
 
 class SidebarComponent extends StatefulWidget {
   final int currentIndex;
@@ -30,8 +36,8 @@ class _SidebarComponentState extends State<SidebarComponent> {
             ListTile(
               dense: true,
               leading: SizedBox(
-                width: ResponsiveWidget.isMediumScreen(context) ? 28 : 40,
-                height: ResponsiveWidget.isMediumScreen(context) ? 28 : 40,
+                width: ResponsiveWidget.isMediumScreen(context) ? 48 : 40,
+                height: ResponsiveWidget.isMediumScreen(context) ? 48 : 40,
                 child: Card(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   elevation: 4,
@@ -41,10 +47,10 @@ class _SidebarComponentState extends State<SidebarComponent> {
               minLeadingWidth: 0,
               horizontalTitleGap: 12,
               contentPadding: EdgeInsets.only(left: 8, right: 16),
-              title: ResponsiveWidget.isMediumScreen(context) ? null : Text('AtriaForce', style: boldTextStyle(size: 20, color: appColors.primaryColor)),
-              subtitle: ResponsiveWidget.isMediumScreen(context) ? null : Text('sushant@abc.com', style: secondaryTextStyle(size: 12)),
+              title: ResponsiveWidget.isMediumScreen(context) ? null : Text(appStrings.lblAppName, style: boldTextStyle(size: 20, color: appColors.primaryColor)),
+              subtitle: ResponsiveWidget.isMediumScreen(context) ? null : Text(AdminRepository.instance.adminData?.email ?? appStrings.lblEmail, style: secondaryTextStyle(size: 12)),
               trailing: ResponsiveWidget.isMediumScreen(context) ? null : ImageIcon(AssetImage(AppAssets.imgCloseDrawer), size: 24),
-              onTap: () {},
+              onTap: null,
             ),
             const Divider(height: 24, thickness: 0.5),
 
@@ -52,7 +58,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
               child: ListView(
                 children: [
                   navItemWidget(title: 'Dashboard', icon: Icons.space_dashboard, index: 0, isTrailingIcon: false),
-                  navItemWidget(title: 'county', icon: Icons.map_outlined, index: 1),
+                  navItemWidget(title: 'County', icon: Icons.map_outlined, index: 1),
                   navItemWidget(title: 'Stations', icon: Icons.home_work_outlined, index: 2),
                   navItemWidget(title: 'Inspactors', icon: Icons.badge_outlined, index: 3),
                   navItemWidget(title: 'Users', icon: Icons.people_outline, index: 4),
@@ -60,6 +66,8 @@ class _SidebarComponentState extends State<SidebarComponent> {
                 ],
               ),
             ),
+
+            navItemWidget(title: 'Logout', icon: Icons.logout, index: 6, isTrailingIcon: false, color: appColors.errorColor),
 
             const Divider(height: 18, thickness: 0.5),
 
@@ -81,11 +89,11 @@ class _SidebarComponentState extends State<SidebarComponent> {
     );
   }
 
-  Widget navItemWidget({required String title, required IconData icon, required int index, bool? isTrailingIcon = true, Widget? trailing}) {
+  Widget navItemWidget({required String title, required IconData icon, required int index, bool? isTrailingIcon = true, Widget? trailing, Color? color}) {
     final selected = widget.currentIndex == index;
     final bg = selected ? appColors.primaryColor : Colors.transparent;
-    final color = selected ? appColors.white : appColors.textSecondaryColor;
-    final textColor = selected ? appColors.white : appColors.textPrimaryColor;
+    final iconColor = color ?? (selected ? appColors.white : appColors.textSecondaryColor);
+    final textColor = color ?? (selected ? appColors.white : appColors.textPrimaryColor);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
@@ -95,7 +103,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
         leading: SizedBox(
           width: ResponsiveWidget.isMediumScreen(context) ? 16 : 18,
           height: ResponsiveWidget.isMediumScreen(context) ? 16 : 18,
-          child: Icon(icon, color: color, size: 18),
+          child: Icon(icon, color: iconColor, size: 18),
         ),
         minLeadingWidth: 0,
         title: ResponsiveWidget.isMediumScreen(context)
@@ -107,9 +115,21 @@ class _SidebarComponentState extends State<SidebarComponent> {
         trailing: ResponsiveWidget.isMediumScreen(context)
             ? null
             : isTrailingIcon == true
-            ? trailing ?? Icon(Icons.add_circle_outline_sharp, color: color, size: 20)
+            ? trailing ?? Icon(Icons.arrow_forward_ios_rounded, color: color, size: s.s18)
             : null,
-        onTap: () => widget.onSelect?.call(index),
+        onTap: index == 6
+            ? () async {
+                final shouldLogout = await LogoutConfirmationDialog.show(context: context);
+
+                if (shouldLogout == true) {
+                  await LocalStorageService.instance.clearAllLocal();
+                  await LocalStorageService.instance.clearAllSecure();
+                  if (context.mounted) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                  }
+                }
+              }
+            : () => widget.onSelect?.call(index),
       ),
     );
   }

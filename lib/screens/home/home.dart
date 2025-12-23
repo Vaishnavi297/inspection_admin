@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspection_station/utils/common/responsive_widget.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
 import 'components/sidebar_component.dart';
 import '../dashboard/dashboard_page.dart';
+import '../county/county_page.dart';
+import '../county/bloc/county_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,7 +22,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return const DashboardPage();
       case 1:
-        return _SectionPlaceholder(title: 'County');
+        return BlocProvider(create: (context) => CountyBloc(), child: const CountyPage());
       case 2:
         return _SectionPlaceholder(title: 'Stations');
       case 3:

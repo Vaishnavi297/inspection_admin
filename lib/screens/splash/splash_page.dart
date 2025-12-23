@@ -1,6 +1,8 @@
 import 'package:inspection_station/utils/extensions/duration_extension.dart';
 import 'package:inspection_station/utils/extensions/int_extension.dart';
 
+import '../../data/repositories/admin_repository/admin_repository.dart';
+import '../../utils/common_utils.dart';
 import '../../utils/routes/app_routes.dart';
 import '/../utils/constants/app_assets.dart';
 import '../../utils/constants/app_dimension.dart';
@@ -24,7 +26,24 @@ class _SplashPageState extends State<SplashPage> {
 
   Future init() async {
     await 3.second.delay();
-    if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+    manageNavigation();
+  }
+
+  Future manageNavigation() async {
+    final adminRepo = AdminRepository.instance;
+    await adminRepo.getAdminData();
+    if (!mounted) return;
+
+    if (adminRepo.isAdminLogout) {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+      return;
+    }
+
+    if (adminRepo.isLogin) {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+    }
   }
 
   @override
@@ -38,9 +57,7 @@ class _SplashPageState extends State<SplashPage> {
             Image.asset(AppAssets.imgLogo, height: s.s120, width: s.s120),
             Padding(
               padding: EdgeInsets.all(s.s8),
-              child: Column(
-                children: [Text(appStrings.lblInspectionWV, style: boldTextStyle(size: FontSize.s32))],
-              ),
+              child: Text(appStrings.lblInspectionWV, style: boldTextStyle(size: FontSize.s32)),
             ),
           ],
         ),
