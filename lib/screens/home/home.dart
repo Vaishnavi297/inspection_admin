@@ -6,6 +6,8 @@ import '../inspaction_station/Inspaction_station_page.dart';
 import '../inspaction_station/bloc/inspaction_station_bloc.dart';
 import 'components/sidebar_component.dart';
 import '../dashboard/dashboard_page.dart';
+import '../users/users_page.dart';
+import '../users/bloc/users_bloc.dart';
 import '../county/county_page.dart';
 import '../county/bloc/county_bloc.dart';
 
@@ -30,7 +32,7 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return _SectionPlaceholder(title: 'Inspactors');
       case 4:
-        return _SectionPlaceholder(title: 'Users');
+        return BlocProvider(create: (context) => UsersBloc(), child: const UsersPage());
       case 5:
         return _SectionPlaceholder(title: 'Settings');
       default:

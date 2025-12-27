@@ -76,6 +76,7 @@ class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
         if (e is String) ends[day] = e;
       }
     }
+    // ignore: invalid_use_of_visible_for_testing_member
     emit(WorkingHoursState(selectedDays: selected, startTimes: starts, endTimes: ends));
     return this;
   }

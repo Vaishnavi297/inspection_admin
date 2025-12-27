@@ -191,8 +191,7 @@ class MediaService {
         if (res == null || res.files.isEmpty) return [];
         return res.files.where((pf) => pf.path != null).map((pf) => PickedMedia(file: File(pf.path!))).toList();
       case MediaType.any:
-      default:
-        return await pickFiles(allowMultiple: allowMultiple);
+      return await pickFiles(allowMultiple: allowMultiple);
     }
   }
 

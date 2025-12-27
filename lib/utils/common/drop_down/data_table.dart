@@ -726,7 +726,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width * (_visibleColumns.length < 6 ? 1.0 : 1.0)),
+                  constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width * (_visibleColumns.length < 6 ? 0.8 : 1.0)),
                   child: DataTable(
                     showCheckboxColumn: false,
                     dividerThickness: 0.02,
@@ -1082,9 +1082,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         },
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child:  Icon(Icons.view_column_outlined, size: 20, color: Color(0xFF6B7280))
-            
-          
+          child: Icon(Icons.view_column_outlined, size: 20, color: Color(0xFF6B7280)),
         ),
       ),
     );
@@ -1283,9 +1281,8 @@ class _FilterDropdownWithImageState extends State<_FilterDropdownWithImage> {
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
       color: widget.color,
-      icon:  Icon(Icons.filter_alt_outlined, size: 16),
-        
-      
+      icon: Icon(Icons.filter_alt_outlined, size: 16),
+
       onCanceled: () {
         _searchController.clear();
       },
