@@ -1087,10 +1087,13 @@ DataCell buildActionCell(
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: rowActions.where((e) => e.type == RowActionType.view).first.icon != null
-                  ? Icon(
-                      rowActions.where((e) => e.type == RowActionType.view).first.icon,
-                      size: 18,
-                      color: rowActions.where((e) => e.type == RowActionType.view).first.color ?? const Color(0xFF6B7280),
+                  ? Tooltip(
+                      message: rowActions.where((e) => e.type == RowActionType.view).first.hoverMessage ?? 'View',
+                      child: Icon(
+                        rowActions.where((e) => e.type == RowActionType.view).first.icon,
+                        size: 18,
+                        color: rowActions.where((e) => e.type == RowActionType.view).first.color ?? const Color(0xFF6B7280),
+                      ),
                     )
                   : SvgPicture.asset(
                       'assets/svg/icons/eye_view_curved.svg',
@@ -1107,10 +1110,13 @@ DataCell buildActionCell(
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: rowActions.where((e) => e.type == RowActionType.modify).first.icon != null
-                  ? Icon(
-                      rowActions.where((e) => e.type == RowActionType.modify).first.icon,
-                      size: 18,
-                      color: rowActions.where((e) => e.type == RowActionType.modify).first.color ?? const Color(0xFF6B7280),
+                  ? Tooltip(
+                      message: rowActions.where((e) => e.type == RowActionType.modify).first.hoverMessage ?? 'Modify',
+                      child: Icon(
+                        rowActions.where((e) => e.type == RowActionType.modify).first.icon,
+                        size: 18,
+                        color: rowActions.where((e) => e.type == RowActionType.modify).first.color ?? const Color(0xFF6B7280),
+                      ),
                     )
                   : SvgPicture.asset(
                       'assets/svg/icons/edit_curved.svg',
@@ -1126,10 +1132,13 @@ DataCell buildActionCell(
             borderRadius: BorderRadius.circular(4),
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(
-                rowActions.where((e) => e.type == RowActionType.inlineEdit).first.icon ?? Icons.edit_note,
-                size: 18,
-                color: rowActions.where((e) => e.type == RowActionType.inlineEdit).first.color ?? const Color(0xFF6B7280),
+              child: Tooltip(
+                message: rowActions.where((e) => e.type == RowActionType.inlineEdit).first.hoverMessage ?? 'Inline Edit',
+                child: Icon(
+                  rowActions.where((e) => e.type == RowActionType.inlineEdit).first.icon ?? Icons.edit_note,
+                  size: 18,
+                  color: rowActions.where((e) => e.type == RowActionType.inlineEdit).first.color ?? const Color(0xFF6B7280),
+                ),
               ),
             ),
           ),
@@ -1139,10 +1148,13 @@ DataCell buildActionCell(
             borderRadius: BorderRadius.circular(4),
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(
-                rowActions.where((e) => e.type == RowActionType.execute).first.icon ?? Icons.launch,
-                size: 18,
-                color: rowActions.where((e) => e.type == RowActionType.execute).first.color ?? const Color(0xFF6B7280),
+              child: Tooltip(
+                message: rowActions.where((e) => e.type == RowActionType.execute).first.hoverMessage ?? 'Execute',
+                child: Icon(
+                  rowActions.where((e) => e.type == RowActionType.execute).first.icon ?? Icons.launch,
+                  size: 18,
+                  color: rowActions.where((e) => e.type == RowActionType.execute).first.color ?? const Color(0xFF6B7280),
+                ),
               ),
             ),
           ),
@@ -1153,10 +1165,13 @@ DataCell buildActionCell(
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: rowActions.where((e) => e.type == RowActionType.delete).first.icon != null
-                  ? Icon(
-                      rowActions.where((e) => e.type == RowActionType.delete).first.icon,
-                      size: 18,
-                      color: rowActions.where((e) => e.type == RowActionType.delete).first.color ?? const Color(0xFFEF4444),
+                  ? Tooltip(
+                      message: rowActions.where((e) => e.type == RowActionType.delete).first.hoverMessage ?? 'Delete',
+                      child: Icon(
+                        rowActions.where((e) => e.type == RowActionType.delete).first.icon,
+                        size: 18,
+                        color: rowActions.where((e) => e.type == RowActionType.delete).first.color ?? const Color(0xFFEF4444),
+                      ),
                     )
                   : SvgPicture.asset(
                       'assets/svg/icons/trash_curved.svg',
@@ -1172,10 +1187,13 @@ DataCell buildActionCell(
             borderRadius: BorderRadius.circular(4),
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(
-                rowActions.where((e) => e.type == RowActionType.renew).first.icon ?? Icons.autorenew_outlined,
-                size: 18,
-                color: rowActions.where((e) => e.type == RowActionType.renew).first.color ?? const Color(0xFF6B7280),
+              child: Tooltip(
+                message: rowActions.where((e) => e.type == RowActionType.renew).first.hoverMessage ?? 'Renew',
+                child: Icon(
+                  rowActions.where((e) => e.type == RowActionType.renew).first.icon ?? Icons.autorenew_outlined,
+                  size: 18,
+                  color: rowActions.where((e) => e.type == RowActionType.renew).first.color ?? const Color(0xFF6B7280),
+                ),
               ),
             ),
           ),

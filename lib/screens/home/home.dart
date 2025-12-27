@@ -4,6 +4,8 @@ import 'package:inspection_station/utils/common/responsive_widget.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
 import '../inspaction_station/Inspaction_station_page.dart';
 import '../inspaction_station/bloc/inspaction_station_bloc.dart';
+import '../inspactors/inspactor_page.dart';
+import '../inspactors/bloc/inspactor_bloc.dart';
 import 'components/sidebar_component.dart';
 import '../dashboard/dashboard_page.dart';
 import '../users/users_page.dart';
@@ -30,10 +32,12 @@ class _HomePageState extends State<HomePage> {
       case 2:
         return BlocProvider(create: (context) => InspactionStationBloc(), child: const InspactionStationPage());
       case 3:
-        return _SectionPlaceholder(title: 'Inspactors');
+        return BlocProvider(create: (context) => InspactorBloc(), child: const InspactorsPage());
       case 4:
         return BlocProvider(create: (context) => UsersBloc(), child: const UsersPage());
       case 5:
+        return _SectionPlaceholder(title: 'Vehicles');
+      case 6:
         return _SectionPlaceholder(title: 'Settings');
       default:
         return const SizedBox();

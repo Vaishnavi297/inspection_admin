@@ -62,12 +62,14 @@ class _SidebarComponentState extends State<SidebarComponent> {
                   navItemWidget(title: 'Stations', icon: Icons.home_work_outlined, index: 2),
                   navItemWidget(title: 'Inspactors', icon: Icons.badge_outlined, index: 3),
                   navItemWidget(title: 'Users', icon: Icons.people_outline, index: 4),
-                  navItemWidget(title: 'Settings', icon: Icons.settings_outlined, index: 5, isTrailingIcon: false),
+                  navItemWidget(title: 'Vehicles', icon: Icons.directions_car_outlined, index: 5),
+
+                  navItemWidget(title: 'Settings', icon: Icons.settings_outlined, index: 6, isTrailingIcon: false),
                 ],
               ),
             ),
 
-            navItemWidget(title: 'Logout', icon: Icons.logout, index: 6, isTrailingIcon: false, color: appColors.errorColor),
+            navItemWidget(title: 'Logout', icon: Icons.logout, index: 7, isTrailingIcon: false, color: appColors.errorColor),
 
             const Divider(height: 18, thickness: 0.5),
 
@@ -117,7 +119,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
             : isTrailingIcon == true
             ? trailing ?? Icon(Icons.arrow_forward_ios_rounded, color: color, size: s.s18)
             : null,
-        onTap: index == 6
+        onTap: index == 7
             ? () async {
                 final shouldLogout = await LogoutConfirmationDialog.show(context: context);
 
