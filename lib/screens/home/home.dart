@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspection_station/utils/common/responsive_widget.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
+import '../inspaction_station/Inspaction_station_page.dart';
+import '../inspaction_station/bloc/inspaction_station_bloc.dart';
 import 'components/sidebar_component.dart';
 import '../dashboard/dashboard_page.dart';
 import '../county/county_page.dart';
@@ -24,7 +26,7 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return BlocProvider(create: (context) => CountyBloc(), child: const CountyPage());
       case 2:
-        return _SectionPlaceholder(title: 'Stations');
+        return BlocProvider(create: (context) => InspactionStationBloc(), child: const InspactionStationPage());
       case 3:
         return _SectionPlaceholder(title: 'Inspactors');
       case 4:

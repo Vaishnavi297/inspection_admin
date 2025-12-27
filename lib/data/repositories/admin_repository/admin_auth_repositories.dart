@@ -47,7 +47,7 @@ class AdminAuthRepository {
       var _ref = await _adminRepo.addAdmin(adminToSave);
 
       return adminToSave.copyWith(id: _ref.id);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       // Re-throw FirebaseAuthException so caller can handle specific sign_up errors
       rethrow;
     } catch (e) {
@@ -71,13 +71,11 @@ class AdminAuthRepository {
         // Auth succeeded but no uid — treat as failure
         return null;
       }
-
       // Fetch admin by Firebase Auth UID from Firestore
       // The UID is stored in the 'id' field, not as the document ID
       final AdminModel? admin = await _adminRepo.getAdminByAuthUid(uid);
-
       return admin;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       // Re-throw so caller can handle specific sign_up errors
       rethrow;
     } catch (e) {

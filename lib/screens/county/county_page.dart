@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inspection_station/utils/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 import '../../components/app_button/app_button.dart';
-import '../../utils/common/scrollable_data_table.dart';
+import '../../utils/common/drop_down/data_table.dart';
+import '../../utils/common/drop_down/utils.dart';
 import '../../utils/constants/app_strings.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
@@ -22,8 +22,6 @@ class CountyPage extends StatefulWidget {
 }
 
 class _CountyPageState extends State<CountyPage> {
-  final ScrollController _horizontalScrollController = ScrollController();
-  final ScrollController _verticalScrollController = ScrollController();
 
   @override
   void initState() {
@@ -102,91 +100,42 @@ class _CountyPageState extends State<CountyPage> {
   }
 
   Widget dataTableWidget(List<County> counties) {
-    return ScrollableDataTable(
-      horizontalController: _horizontalScrollController,
-      verticalController: _verticalScrollController,
-      headingRowColor: appColors.primaryColor,
-      borderRadius: appConstants.defaultRadius,
-      minWidth: MediaQuery.of(context).size.width,
-      columnSpacing: s.s0,
-      headingRowHeight: s.s40,
-      margin: EdgeInsets.symmetric(horizontal: s.s0),
-      expand: false,
-      headingTextStyle: boldTextStyle(size: FontSize.s14, fontWeight: FontWeight.w600, color: appColors.textPrimaryColor),
-      columns: [
-        DataColumn(label: Text('Sr. No.', style: boldTextStyle())),
+    final columns = ['Sr. No.', 'County Name', 'Created At'];
+    final data = counties
+        .asMap()
+        .entries
+        .map(
+          (e) => {
+            'Sr. No.': (e.key + 1).toString(),
+            'County Name': e.value.countyName,
+            'Created At': e.value.createTime == null ? '-' : DateFormat('dd MMM yy hh:mm a').format(e.value.createTime!.toDate()),
+            '_model': e.value,
+          },
+        )
+        .toList();
 
-        DataColumn(label: Text('County Name', style: boldTextStyle())),
-        DataColumn(label: Text('Created At', style: boldTextStyle())),
-
-        DataColumn(
-          label: Text('Actions', textAlign: TextAlign.center, style: boldTextStyle()),
-        ),
-      ],
-      rows: counties.asMap().entries.map((entry) {
-        final i = entry.key;
-        final county = entry.value;
-        return DataRow(
-          color: WidgetStateProperty.resolveWith((_) => i.isOdd ? appColors.surfaceColor.withOpacity(0.04) : appColors.surfaceColor),
-          cells: [
-            DataCell(
-              Text(
-                (i + 1).toString(),
-                style: boldTextStyle(size: s.s14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            DataCell(
-              Text(
-                county.countyName,
-                style: boldTextStyle(size: s.s14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            DataCell(
-              Text(
-                county.createTime == null ? '-' : DateFormat('dd MMM yy hh:mm a').format(county.createTime!.toLocal()),
-                style: boldTextStyle(size: s.s14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            DataCell(
-              Row(
-                spacing: s.s8,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  InkWell(
-                    onTap: () => _onEditCountyTap(context, county),
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: appColors.surfaceColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: appColors.primaryColor.withOpacity(0.8)),
-                      ),
-                      child: Icon(Icons.edit, color: appColors.primaryColor, size: 16),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => _onDeleteCountyTap(context, county),
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: appColors.surfaceColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: appColors.red.withOpacity(0.8)),
-                      ),
-                      child: Icon(Icons.delete, color: appColors.red, size: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      }).toList(),
+    return DataTableWidget(
+      columns: columns,
+      data: data,
+      titleDatatableText: 'All Counties',
+      subTitleDatatableText: 'Manage counties across West Virginia',
+      headerColor: appColors.primaryColor,
+      headerColumnColor: appColors.textPrimaryColor,
+      cellTextColor: appColors.primaryTextColor,
+      // Use default DataTable row heights to avoid min>max constraint issues
+      rowActions: {
+        RowAction(RowActionType.modify, icon: Icons.edit_outlined),
+        RowAction(RowActionType.delete, icon: Icons.delete_outlined),
+      },
+      onModify: (row) {
+        final county = row['_model'] as County;
+        _onEditCountyTap(context, county);
+      },
+      onDelete: (row) {
+        final county = row['_model'] as County;
+        _onDeleteCountyTap(context, county);
+      },
+      actionColumnName: 'Actions',
     );
   }
 

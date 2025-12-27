@@ -92,16 +92,21 @@ class AdminRepository {
     _localStorageService.spWriteBool(LocalStorageService.kisLogin, true);
     _isLogin = true;
 
-    if (admin.id != null) {
-      _localStorageService.spWriteString(LocalStorageService.kAID, admin.id);
-      _aid = admin.id;
-    }
-
-    if (admin.name != null) {
-      _localStorageService.spWriteString(LocalStorageService.kAName, admin.name);
-      _aName = admin.name;
-    }
-    _localStorageService.spWriteJson(LocalStorageService.kAdminData, admin.toJson());
+    _localStorageService.spWriteString(LocalStorageService.kAID, admin.id);
+    _aid = admin.id;
+  
+    _localStorageService.spWriteString(LocalStorageService.kAName, admin.name);
+    _aName = admin.name;
+      final localAdminJson = {
+      'id': admin.id,
+      'email': admin.email,
+      'name': admin.name,
+      'role': admin.role,
+      'isAdminLogout': admin.isAdminLogout ?? false,
+      'createdAt': admin.createdAt.toDate().toIso8601String(),
+      'updatedAt': admin.updatedAt.toDate().toIso8601String(),
+    };
+    _localStorageService.spWriteJson(LocalStorageService.kAdminData, localAdminJson);
     _isAdminLogout = false;
     _adminData = admin;
   }
@@ -127,6 +132,4 @@ class AdminRepository {
       _isAdminLogout = true;
     }
   }
-
-
 }

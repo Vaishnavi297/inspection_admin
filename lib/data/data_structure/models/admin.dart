@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class AdminModel {
   final String id;
   final String email;
@@ -5,8 +7,8 @@ class AdminModel {
   final String name;
   final String role;
   final bool? isAdminLogout;
-  final String createdAt;
-  final String updatedAt;
+  final Timestamp createdAt;
+  final Timestamp updatedAt;
 
   AdminModel({required this.id, required this.email, required this.password, required this.name, required this.role, this.isAdminLogout=false, required this.createdAt, required this.updatedAt});
 
@@ -31,8 +33,8 @@ class AdminModel {
     String? name,
     String? role,
     bool? isAdminLogout = false,
-    String? createdAt,
-    String? updatedAt,
+    Timestamp? createdAt,
+    Timestamp? updatedAt,
   }) {
     return AdminModel(
       id: id ?? this.id,

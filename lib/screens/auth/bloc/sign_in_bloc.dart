@@ -50,6 +50,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
         final admin = await _adminAuthRepo.authenticateWithEmailPassword(email: event.email, password: event.password);
 
         if (admin != null) {
+         
           emit(SignInEmailAuthenticated(admin));
         } else {
           emit(SignInError('Authentication succeeded but no admin record found.'));

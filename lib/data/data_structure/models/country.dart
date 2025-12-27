@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class County {
   final String? countyId;
   final String countyName;
   final String countyLowerName;
-  final DateTime? createTime;
-  final DateTime? updateTime;
+  final Timestamp? createTime;
+  final Timestamp? updateTime;
 
   const County({
     this.countyId,
@@ -20,10 +22,10 @@ class County {
       countyName: json['county_name'] as String,
       countyLowerName: json['county_name_lower'] as String,
       createTime: json['create_time'] != null
-          ? DateTime.parse(json['create_time'])
+          ? json['create_time'] as Timestamp
           : null,
       updateTime: json['update_time'] != null
-          ? DateTime.parse(json['update_time'])
+          ? json['update_time'] as Timestamp
           : null,
     );
   }
@@ -34,8 +36,8 @@ class County {
       'county_id': countyId,
       'county_name': countyName,
       'county_name_lower': countyLowerName,
-      'create_time': createTime?.toIso8601String(),
-      'update_time': updateTime?.toIso8601String(),
+      'create_time': createTime,
+      'update_time': updateTime,
     };
   }
 
@@ -44,8 +46,8 @@ class County {
     String? countyId,
     String? countyName,
     String? countryLowerName,
-    DateTime? createTime,
-    DateTime? updateTime,
+    Timestamp? createTime,
+    Timestamp? updateTime,
   }) {
     return County(
       countyId: countyId ?? this.countyId,

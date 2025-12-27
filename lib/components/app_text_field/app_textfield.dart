@@ -38,21 +38,22 @@ Widget textField({
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-        padding: EdgeInsets.only(top: topPadding, bottom: 12),
-        child: RichText(
-          text: TextSpan(
-            text: labelText,
-            style: labelStyle ?? GoogleFonts.ptSans(fontSize: FontSize.s14, color: appColors.textSecondaryColor, fontWeight: FontWeight.w500),
-            children: [
-              // TextSpan(
-              //   text: isMandatory ? ' *' : '',
-              //   style: TextStyle(color: AppColors().red),
-              // ),
-            ],
+      if (labelText != null && labelText.isNotEmpty)
+        Padding(
+          padding: EdgeInsets.only(top: topPadding, bottom: 12),
+          child: RichText(
+            text: TextSpan(
+              text: labelText,
+              style: labelStyle ?? GoogleFonts.ptSans(fontSize: FontSize.s14, color: appColors.textSecondaryColor, fontWeight: FontWeight.w500),
+              children: [
+                // TextSpan(
+                //   text: isMandatory ? ' *' : '',
+                //   style: TextStyle(color: AppColors().red),
+                // ),
+              ],
+            ),
           ),
         ),
-      ),
       TextFormField(
         maxLength: maxLength,
         controller: controller,

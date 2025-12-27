@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspection_station/utils/common/responsive_widget.dart';
 
 import '../../components/app_text_style/app_text_style.dart';
+import '../../data/repositories/admin_repository/admin_repository.dart';
 import '/../utils/common/decoration.dart';
 import '/../utils/extensions/widget_extensions.dart';
 import '../../utils/constants/app_dimension.dart';
@@ -13,9 +14,6 @@ import '../../utils/validators.dart';
 
 import '../../components/app_text_field/app_textfield.dart';
 import '../../components/app_button/app_button.dart';
-import '../../data/data_structure/models/admin.dart';
-import '../../data/repositories/admin_repository/admin_auth_repositories.dart';
-import 'cubit/login_password_visibility_cubit.dart';
 import 'bloc/sign_in_bloc.dart';
 
 class LoginPage extends StatefulWidget {
@@ -40,12 +38,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (formKey.currentState?.validate() ?? false) {
       // Dispatch login event to bloc
-      context.read<SignInBloc>().add(
-        SignInWithEmailEvent(
-          email: emailTextController.text.trim(),
-          password: passwordTextController.text.trim(),
-        ),
-      );
+      context.read<SignInBloc>().add(SignInWithEmailEvent(email: emailTextController.text.trim(), password: passwordTextController.text.trim()));
     }
   }
 
@@ -65,16 +58,12 @@ class _LoginPageState extends State<LoginPage> {
   //     password: passwordTextController.text.trim(),
   //     name: 'Admin',
   //     role: 'admin',
-  //     createdAt: now,
+  //     createdAt: Timestamp.fromDate(DateTime.parse(now)),
   //     isAdminLogout: false,
-  //     updatedAt: now,
+  //     updatedAt: Timestamp.fromDate(DateTime.parse(now)),
   //   );
 
-  //   await AdminAuthRepository.instance.registerWithEmailPassword(
-  //     email: admin.email,
-  //     password: admin.password,
-  //     adminData: admin,
-  //   );
+  //   await AdminAuthRepository.instance.registerWithEmailPassword(email: admin.email, password: admin.password, adminData: admin);
   // }
 
   @override
@@ -86,21 +75,15 @@ class _LoginPageState extends State<LoginPage> {
       },
       listener: (context, state) {
         if (state is SignInEmailAuthenticated) {
+          // Persist admin data locally for sidebar/profile display
+          AdminRepository.instance.manageAdminDataLocally(state.loginAdmin);
           // Navigate to home on successful login
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.home,
-            (route) => false,
-          );
+          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
         } else if (state is SignInError) {
           // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? 'Login failed. Please check your credentials.'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 4),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage ?? 'Login failed. Please check your credentials.'), backgroundColor: Colors.red, duration: const Duration(seconds: 4)));
         }
       },
       child: Scaffold(

@@ -2,7 +2,6 @@ import 'package:inspection_station/utils/extensions/duration_extension.dart';
 import 'package:inspection_station/utils/extensions/int_extension.dart';
 
 import '../../data/repositories/admin_repository/admin_repository.dart';
-import '../../utils/common_utils.dart';
 import '../../utils/routes/app_routes.dart';
 import '/../utils/constants/app_assets.dart';
 import '../../utils/constants/app_dimension.dart';

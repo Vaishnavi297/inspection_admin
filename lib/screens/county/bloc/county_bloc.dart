@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -35,8 +36,8 @@ class CountyBloc extends Bloc<CountyEvent, CountyState> {
         countyId: '', 
         countyName: event.countyName,
         countyLowerName: event.countyLowerName,
-        createTime: DateTime.now(),
-        updateTime: DateTime.now(),
+        createTime: Timestamp.now(),
+        updateTime: Timestamp.now(),
       );  
       await _countyRepository.addCounty(county);
       
@@ -53,7 +54,7 @@ class CountyBloc extends Bloc<CountyEvent, CountyState> {
     try {
       final updatedCounty = event.county.copyWith(
         countyName: event.countyName,
-        updateTime: DateTime.now(),
+        updateTime: Timestamp.now(),
         createTime: event.county.createTime,
         countyId: event.county.countyId,
         countryLowerName: event.countyLowerName,
