@@ -12,6 +12,8 @@ import '../users/users_page.dart';
 import '../users/bloc/users_bloc.dart';
 import '../county/county_page.dart';
 import '../county/bloc/county_bloc.dart';
+import '../vehicles/vehicles_page.dart';
+import '../vehicles/bloc/vehicles_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,7 +38,7 @@ class _HomePageState extends State<HomePage> {
       case 4:
         return BlocProvider(create: (context) => UsersBloc(), child: const UsersPage());
       case 5:
-        return _SectionPlaceholder(title: 'Vehicles');
+        return BlocProvider(create: (context) => VehiclesBloc(), child: const VehiclesPage());
       case 6:
         return _SectionPlaceholder(title: 'Settings');
       default:
