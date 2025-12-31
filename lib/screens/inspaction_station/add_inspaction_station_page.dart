@@ -11,6 +11,7 @@ import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import '../../data/repositories/county_repository/county_repository.dart';
 import '../../data/data_structure/models/country.dart';
+import '../../data/services/firebase_service/firebase_authentication_services.dart';
 
 class AddInspactionStationPage extends StatefulWidget {
   final InspactionStation? station;
@@ -112,6 +113,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
                           ),
                         ],
                       ),
+                      // Registration via mobile OTP; email credential field removed.
                       textField(
                         controller: _addressController,
                         labelText: 'Address *',
@@ -202,7 +204,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
     );
   }
 
-  void _onSave(BuildContext dialogContext) {
+  Future<void> _onSave(BuildContext dialogContext) async {
     if (_formKey.currentState?.validate() != true) return;
     if (_selectedCounty == null) {
       ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: const Text('Select County'), backgroundColor: appColors.errorColor));
@@ -220,10 +222,29 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
 
     final apiHours = hoursBloc.toApiJson();
 
+    final phone = _phoneController.text.trim();
+    String? authUid;
+    if (phone.isNotEmpty) {
+      try {
+        final verificationId = await AuthService.instance.sendOtp(phoneNumber: phone);
+        final smsCode = await _promptOtpInput(dialogContext, phone);
+        if (smsCode == null || smsCode.trim().isEmpty) {
+          ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: const Text('OTP verification cancelled'), backgroundColor: appColors.errorColor));
+          return;
+        }
+        final cred = await AuthService.instance.verifyOtp(verificationId: verificationId, smsCode: smsCode.trim());
+        authUid = cred.user?.uid;
+      } catch (e) {
+        ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text('Phone verification failed: $e'), backgroundColor: appColors.errorColor));
+        return;
+      }
+    }
+
     InspactionStation station = InspactionStation(
       stationId: _stationIdController.text.trim(),
       stationName: _stationNameController.text.trim(),
       // stationNameLower: _stationNameController.text.trim().toLowerCase(),
+      stationAuthUid: authUid,
       stationAddress: _addressController.text.trim(),
       stationContactNumber: _phoneController.text.trim(),
       sCountyDetails: _selectedCounty!,
@@ -235,7 +256,42 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
 
       workingHours: apiHours,
     );
+
     Navigator.of(dialogContext).pop(station);
+  }
+
+  Future<String?> _promptOtpInput(BuildContext context, String phone) async {
+    final controller = TextEditingController();
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'Enter OTP',
+          style: boldTextStyle(size: 18, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('OTP sent to $phone', style: secondaryTextStyle(color: appColors.secondaryTextColor)),
+            SizedBox(height: s.s12),
+            textField(controller: controller, labelText: 'OTP Code', hintText: '123456'),
+          ],
+        ),
+        actions: [
+          AppButton(
+            height: 40,
+            width: 140,
+            backgroundColor: appColors.transparent,
+            isBorderEnable: true,
+            onTap: () => Navigator.of(ctx).pop(null),
+            btnWidget: Text('Cancel', style: primaryTextStyle(color: appColors.secondaryTextColor)),
+          ),
+          AppButton(height: 40, width: 160, strTitle: 'Verify', onTap: () => Navigator.of(ctx).pop(controller.text.trim())),
+        ],
+      ),
+    );
+    return result;
   }
 }
 

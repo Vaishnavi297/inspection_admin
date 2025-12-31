@@ -31,21 +31,8 @@ class InspactionStationBloc extends Bloc<InspactionStationEvent, InspactionStati
   Future<void> _onAddStation(AddInspactionStationEvent event, Emitter<InspactionStationState> emit) async {
     emit(InspactionStationLoading());
     try {
-      final station = InspactionStation(
-        stationId: event.station.stationId,
-        stationName: event.station.stationName,
-        // stationNameLower: event.station.stationNameLower,
-        stationActivationStatus: true,
-        sCountyDetails: event.station.sCountyDetails,
-        stationAddress: event.station.stationAddress,
-        stationContactNumber: event.station.stationContactNumber,
-        workingHours: event.station.workingHours,
-        stationDescription: event.station.stationDescription,
-        createTime: Timestamp.now(),
-        updateTime: Timestamp.now(),
-        maxInspectors: event.station.maxInspectors,
-      );
-      await _repo.addStation(station);
+      final stationToSave = event.station.copyWith(stationActivationStatus: true, createTime: Timestamp.now(), updateTime: Timestamp.now());
+      await _repo.addStation(stationToSave);
       final list = await _repo.getAllStations();
       emit(InspactionStationLoaded(list));
     } catch (e) {

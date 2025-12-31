@@ -8,7 +8,8 @@ class InspactionStation {
   final String stationName;
   // final String? stationNameLower;
 
-  // final String? stationRegEmail;
+  final String? stationRegEmail;
+  final String? stationAuthUid;
   final String? stationContactNumber;
   // final String? stationTelNo;
 
@@ -41,7 +42,8 @@ class InspactionStation {
     this.stationId,
     required this.stationName,
     // this.stationNameLower,
-    // this.stationRegEmail,
+    this.stationRegEmail,
+    this.stationAuthUid,
     this.stationContactNumber,
     // this.stationTelNo,
     this.stationAddress,
@@ -71,9 +73,10 @@ class InspactionStation {
       sId: json['sId'],
       stationId: json['station_id'],
       stationName: json['station_name'] as String,
-      // stationNameLower: json['station_name_lower'],
 
-      // stationRegEmail: json['station_reg_email'],
+      // stationNameLower: json['station_name_lower'],
+      stationRegEmail: json['station_reg_email'],
+      stationAuthUid: json['station_auth_uid'],
       stationContactNumber: json['station_contact_number'],
 
       // stationTelNo: json['station_tel_no'],
@@ -116,7 +119,8 @@ class InspactionStation {
       'station_id': stationId,
       'station_name': stationName,
       // 'station_name_lower': stationNameLower,
-      // 'station_reg_email': stationRegEmail,
+      'station_reg_email': stationRegEmail,
+      'station_auth_uid': stationAuthUid,
       'station_contact_number': stationContactNumber,
       // 'station_tel_no': stationTelNo,
       'station_address': stationAddress,
@@ -147,7 +151,8 @@ class InspactionStation {
     String? stationId,
     String? stationName,
     // String? stationNameLower,
-    // String? stationRegEmail,
+    String? stationRegEmail,
+    String? stationAuthUid,
     String? stationContactNumber,
     // String? stationTelNo,
     String? stationAddress,
@@ -174,7 +179,8 @@ class InspactionStation {
       stationId: stationId ?? this.stationId,
       stationName: stationName ?? this.stationName,
       // stationNameLower: stationNameLower ?? this.stationNameLower,
-      // stationRegEmail: stationRegEmail ?? this.stationRegEmail,
+      stationRegEmail: stationRegEmail ?? this.stationRegEmail,
+      stationAuthUid: stationAuthUid ?? this.stationAuthUid,
       stationContactNumber: stationContactNumber ?? this.stationContactNumber,
       // stationTelNo: stationTelNo ?? this.stationTelNo,
       stationAddress: stationAddress ?? this.stationAddress,
