@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inspection_station/data/data_structure/models/admin.dart';
 import 'package:inspection_station/utils/common/responsive_widget.dart';
 
 import '../../components/app_text_style/app_text_style.dart';
+import '../../data/repositories/admin_repository/admin_auth_repositories.dart';
 import '../../data/repositories/admin_repository/admin_repository.dart';
 import '/../utils/common/decoration.dart';
 import '/../utils/extensions/widget_extensions.dart';
@@ -42,29 +45,29 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Future<void> _registerAdmin({bool useDemoCredentials = false}) async {
-  //   if (useDemoCredentials) {
-  //     emailTextController.text = 'demo@inspectionwv.com';
-  //     passwordTextController.text = '12345678';
-  //   }
+  Future<void> _registerAdmin({bool useDemoCredentials = false}) async {
+    if (useDemoCredentials) {
+      emailTextController.text = 'demo@inspectionwv.com';
+      passwordTextController.text = '12345678';
+    }
 
-  //   if (!(formKey.currentState?.validate() ?? false)) return;
+    if (!(formKey.currentState?.validate() ?? false)) return;
 
-  //   final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toIso8601String();
 
-  //   final admin = AdminModel(
-  //     id: '',
-  //     email: emailTextController.text.trim(),
-  //     password: passwordTextController.text.trim(),
-  //     name: 'Admin',
-  //     role: 'admin',
-  //     createdAt: Timestamp.fromDate(DateTime.parse(now)),
-  //     isAdminLogout: false,
-  //     updatedAt: Timestamp.fromDate(DateTime.parse(now)),
-  //   );
+    final admin = AdminModel(
+      id: '',
+      email: emailTextController.text.trim(),
+      password: passwordTextController.text.trim(),
+      name: 'Admin',
+      role: 'admin',
+      createdAt: Timestamp.fromDate(DateTime.parse(now)),
+      isAdminLogout: false,
+      updatedAt: Timestamp.fromDate(DateTime.parse(now)),
+    );
 
-  //   await AdminAuthRepository.instance.registerWithEmailPassword(email: admin.email, password: admin.password, adminData: admin);
-  // }
+    await AdminAuthRepository.instance.registerWithEmailPassword(email: admin.email, password: admin.password, adminData: admin);
+  }
 
   @override
   Widget build(BuildContext context) {

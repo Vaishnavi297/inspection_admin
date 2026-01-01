@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 
 class AuthService {
   AuthService._privateConstructor();
@@ -10,15 +12,9 @@ class AuthService {
 
   /// Create user with email & password
   /// Throws FirebaseAuthException on failure.
-  Future<String?> createUserWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    final credential = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    if (credential.user!=null) {
+  Future<String?> createUserWithEmail({required String email, required String password}) async {
+    final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    if (credential.user != null) {
       return credential.user!.uid;
     }
     return null;
@@ -26,38 +22,35 @@ class AuthService {
 
   /// Sign in with email & password
   /// Throws FirebaseAuthException on failure.
-  Future<UserCredential> signInWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    final credential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+  Future<UserCredential> signInWithEmail({required String email, required String password}) async {
+    final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
     return credential;
   }
-
 
   /// Send OTP to phone number and return the verificationId.
   /// The phone number should include the country code, e.g. +91xxxxxxxxxx
   /// This function wraps [verifyPhoneNumber] and completes when the code is sent.
   /// Note: On web you must use a RecaptchaVerifier and a different flow.
-  Future<String> sendOtp({
-    required String phoneNumber,
-    Duration timeout = const Duration(seconds: 60),
-  }) async {
+  Future<String> sendOtp({required String phoneNumber, Duration timeout = const Duration(seconds: 60)}) async {
+    if (kIsWeb) {
+      // final _auth = FirebaseAuth.instance;
+      final verifier = RecaptchaVerifier(auth: FirebaseAuthPlatform.instance, container: 'recaptcha-container', size: RecaptchaVerifierSize.compact);
+
+      final confirmationResult = await FirebaseAuth.instance.signInWithPhoneNumber(phoneNumber, verifier);
+
+      return confirmationResult.verificationId;
+    }
+
+    // ✅ Mobile (Android / iOS) stays the same
     final Completer<String> completer = Completer();
 
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       timeout: timeout,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        // Auto-retrieval or instant verification on Android
-        // You can choose to sign in automatically here, or let the caller handle it.
         try {
           final userCredential = await _auth.signInWithCredential(credential);
           if (!completer.isCompleted) {
-            // If auto-signed-in, return a special value: the uid as verificationId
             completer.complete(userCredential.user?.uid ?? '');
           }
         } catch (e) {
@@ -71,7 +64,6 @@ class AuthService {
         if (!completer.isCompleted) completer.complete(verificationId);
       },
       codeAutoRetrievalTimeout: (String verificationId) {
-        // Auto retrieval timed out — still return the verificationId so caller can show OTP input.
         if (!completer.isCompleted) completer.complete(verificationId);
       },
     );
@@ -81,14 +73,8 @@ class AuthService {
 
   /// Verify SMS code (OTP) using [verificationId] returned from [sendOtp]
   /// and [smsCode] provided by the user. Returns the signed-in UserCredential.
-  Future<UserCredential> verifyOtp({
-    required String verificationId,
-    required String smsCode,
-  }) async {
-    final credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
+  Future<UserCredential> verifyOtp({required String verificationId, required String smsCode}) async {
+    final credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
 
     return await _auth.signInWithCredential(credential);
   }
@@ -100,7 +86,7 @@ class AuthService {
 class AuthErrorMessages {
   static String getMessage(String code) {
     switch (code) {
-    // Common email/password
+      // Common email/password
       case 'invalid-credential':
         return 'The provided credentials are incorrect.';
       case 'invalid-email':
@@ -122,7 +108,7 @@ class AuthErrorMessages {
       case 'network-request-failed':
         return 'Network error. Please check your connection.';
 
-    // Phone (OTP) specific
+      // Phone (OTP) specific
       case 'invalid-phone-number':
         return 'The phone number is not valid.';
       case 'missing-phone-number':
@@ -137,7 +123,7 @@ class AuthErrorMessages {
       case 'code-expired': // some platforms/libraries use this term
         return 'The verification code has expired. Request a new one.';
 
-    // Google / federated
+      // Google / federated
       case 'account-exists-with-different-credential':
         return 'An account already exists with a different sign-in method.';
       case 'credential-already-in-use':
@@ -153,4 +139,3 @@ class AuthErrorMessages {
     }
   }
 }
-

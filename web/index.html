@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
   <base href="/" />
@@ -15,12 +16,46 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <title>inpection_admin</title>
   <link rel="manifest" href="manifest.json">
 </head>
-<body>
+
+<body> 
+  <div id="recaptcha-container"></div>
+  <script src="main.dart.js"></script>
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    window.addEventListener('load', function () {
+      Flutter.loader.loadEntrypoint({
+        entrypointUrl: 'main.dart.js',
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
+            appRunner.runApp();
+          });
+        },
+      });
+    });
+    Flutter.loader.loadEntrypoint({
+      entrypointUrl: 'main.dart.js',
+      onEntrypointLoaded: function (engineInitializer) {
+        engineInitializer.initializeEngine().then(function (appRunner) {
+          appRunner.runApp();
+        });
+      },
+    });
+    var firebaseConfig = {
+      apiKey: "AIzaSyDY-MBGIoi-WAcEGVNjMo-K3O3KoN8jmcg",
+      authDomain: "inspection-wv.firebaseapp.com",
+      projectId: "inspection-wv",
+      storageBucket: "inspection-wv.firebasestorage.app",
+      messagingSenderId: "611184420790",
+      appId: "1:611184420790:web:7ed67e37e32082f9914317",
+      measurementId: "G-JFN2GF9V6Y",
+    };
+
+  </script>
 </body>
+
 </html>

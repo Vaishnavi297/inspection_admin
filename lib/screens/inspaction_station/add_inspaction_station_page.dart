@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -236,6 +238,8 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
         authUid = cred.user?.uid;
       } catch (e) {
         ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text('Phone verification failed: $e'), backgroundColor: appColors.errorColor));
+        log('Phone verification failed: $e');
+
         return;
       }
     }
