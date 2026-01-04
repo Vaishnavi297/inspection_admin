@@ -32,14 +32,15 @@ class AuthService {
   /// This function wraps [verifyPhoneNumber] and completes when the code is sent.
   /// Note: On web you must use a RecaptchaVerifier and a different flow.
   Future<String> sendOtp({required String phoneNumber, Duration timeout = const Duration(seconds: 60)}) async {
-    if (kIsWeb) {
-      // final _auth = FirebaseAuth.instance;
-      final verifier = RecaptchaVerifier(auth: FirebaseAuthPlatform.instance, container: 'recaptcha-container', size: RecaptchaVerifierSize.compact);
+    /// 🌐 Flutter Web
+  if (kIsWeb) {
+    final confirmationResult =
+        await FirebaseAuth.instance.signInWithPhoneNumber(
+      phoneNumber,
+    );
 
-      final confirmationResult = await FirebaseAuth.instance.signInWithPhoneNumber(phoneNumber, verifier);
-
-      return confirmationResult.verificationId;
-    }
+    return confirmationResult.verificationId;
+  }
 
     // ✅ Mobile (Android / iOS) stays the same
     final Completer<String> completer = Completer();

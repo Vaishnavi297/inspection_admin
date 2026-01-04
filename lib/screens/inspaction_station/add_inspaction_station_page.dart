@@ -229,9 +229,9 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
     if (phone.isNotEmpty) {
       try {
         final verificationId = await AuthService.instance.sendOtp(phoneNumber: phone);
-        final smsCode = await _promptOtpInput(dialogContext, phone);
+        final smsCode = await _promptOtpInput(context, phone);
         if (smsCode == null || smsCode.trim().isEmpty) {
-          ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: const Text('OTP verification cancelled'), backgroundColor: appColors.errorColor));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('OTP verification cancelled'), backgroundColor: appColors.errorColor));
           return;
         }
         final cred = await AuthService.instance.verifyOtp(verificationId: verificationId, smsCode: smsCode.trim());
