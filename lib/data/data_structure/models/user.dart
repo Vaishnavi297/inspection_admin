@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inspection_station/data/data_structure/models/country.dart';
 
 class AppUser {
@@ -13,8 +14,8 @@ class AppUser {
   final double? cCurrentLatitude;
   final double? cCurrentLongitude;
   final County? cCurrentCountyDetails;
-  final DateTime? createTime;
-  final DateTime? updateTime;
+  final   Timestamp? createTime;
+  final   Timestamp? updateTime;
 
   AppUser({
     this.cId,
@@ -47,8 +48,8 @@ class AppUser {
       cCurrentLongitude: json['c_current_longitude'] != null ? (json['c_current_longitude'] as num).toDouble() : null,
       cDob: json['customer_dob'] != null ? DateTime.parse(json['customer_dob']) : null,
       cCurrentCountyDetails: json['c_current_county_details'] != null ? County.fromJson(json['c_current_county_details']) : null,
-      createTime: json['create_time'] != null ? DateTime.parse(json['create_time']) : null,
-      updateTime: json['update_time'] != null ? DateTime.parse(json['update_time']) : null,
+      createTime: json['create_time'],
+      updateTime: json['update_time'],
     );
   }
 
@@ -68,8 +69,8 @@ class AppUser {
     double? cCurrentLongitude,
     County? cCurrentCountyDetails,
     DateTime? cDob,
-    DateTime? createTime,
-    DateTime? updateTime,
+    Timestamp? createTime,
+    Timestamp? updateTime,  
   }) {
     return AppUser(
       cId: cId ?? this.cId,
@@ -103,8 +104,8 @@ class AppUser {
       'c_profile_image_url': cProfileImageUrl,
       'c_current_county_details': cCurrentCountyDetails != null ? cCurrentCountyDetails!.toJson() : null,
       'customer_dob': cDob?.toIso8601String(),
-      'create_time': createTime?.toIso8601String(),
-      'update_time': updateTime?.toIso8601String(),
+      'create_time': createTime,
+      'update_time': updateTime,
     };
   }
 }

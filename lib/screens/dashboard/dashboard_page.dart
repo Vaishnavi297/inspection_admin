@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspection_station/components/app_text_style/app_text_style.dart';
+import 'package:inspection_station/components/loader_view.dart';
 import 'package:inspection_station/utils/common/responsive_widget.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
 import 'package:inspection_station/utils/constants/app_dimension.dart';
 import 'package:inspection_station/utils/common/decoration.dart';
+import 'package:intl/intl.dart';
+import '../../data/data_structure/models/dashboard_models.dart';
+import 'bloc/dashboard_bloc.dart';
 
 double _calcStatCardWidth(BuildContext context) {
   final isLarge = ResponsiveWidget.isLargeScreen(context);
@@ -25,67 +30,107 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  List<_StatData> get _stats => [
-    _StatData(title: 'Total Stations', value: '4', chips: ['4 Active', '4 Inspectors'], icon: Icons.home_work_outlined, color: appColors.blue),
-    _StatData(title: "Today's Inspections", value: '4', chips: ['3 Passed', '1 Failed'], icon: Icons.fact_check_outlined, color: appColors.green),
-    _StatData(title: 'Total Appointments', value: '4', chips: ['2 Scheduled', '1 Completed'], icon: Icons.calendar_today_outlined, color: appColors.purple),
-    _StatData(title: 'Registered Vehicles', value: '1,247', chips: ['1,189 Active Stickers', '892 Users'], icon: Icons.directions_car_outlined, color: appColors.orange),
-  ];
-
-  List<_ActivityData> get _activities => [
-    _ActivityData(title: 'WV ABC-123 • 2018 Toyota Camry', time: '09:30 AM', subtitle: 'Kanawha Blvd', user: 'Alex Johnson', status: _ActivityStatus.pass),
-    _ActivityData(title: 'WV 7XY-456 • 2021 Honda CR-V', time: '10:15 AM', subtitle: 'South Charleston', user: 'Priya Rao', status: _ActivityStatus.pass),
-    _ActivityData(title: 'WV TRK-789 • 2019 Ford F-150', time: '11:45 AM', subtitle: 'Morgantown', user: 'Lisa Chen', status: _ActivityStatus.fail),
-    _ActivityData(title: 'WV JEEP-01 • 2020 Jeep Wrangler', time: '13:00 PM', subtitle: 'Kanawha Blvd', user: 'Alex Johnson', status: _ActivityStatus.pass),
-  ];
-
-  List<_StationData> get _stations => [
-    _StationData(name: 'Kanawha Blvd Charleston', meta: 'Kanawha County • 1 Inspectors', value: '1247'),
-    _StationData(name: 'South Charleston Station', meta: 'Kanawha County • 1 Inspectors', value: '945'),
-    _StationData(name: 'Morgantown Inspection', meta: 'Monongalia County • 1 Inspectors', value: '780'),
-    _StationData(name: 'Wheeling Vehicle Center', meta: 'Ohio County • 1 Inspectors', value: '670'),
-  ];
-
-  List<_StatusData> get _systemStatuses => [
-    _StatusData(label: 'Database', ok: true),
-    _StatusData(label: 'User Portal', ok: true),
-    _StatusData(label: 'Inspector Portal', ok: true),
-    _StatusData(label: 'Email Service', ok: true),
-  ];
+  // Static system statuses for now as they are usually health checks
+  // List<_StatusData> get _systemStatuses => [
+  //   _StatusData(label: 'Database', ok: true),
+  //   _StatusData(label: 'User Portal', ok: true),
+  //   _StatusData(label: 'Inspector Portal', ok: true),
+  //   _StatusData(label: 'Email Service', ok: true),
+  // ];
 
   String _formatDate(DateTime dt) {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    final d = days[dt.weekday - 1];
-    final m = months[dt.month - 1];
-    return '$d, $m ${dt.day}, ${dt.year}';
+    return DateFormat(' d, MMMM EEEE, yyyy').format(dt);
+  }
+
+  List<_StatData> _mapToStatData(DashboardStats stats) {
+    return [
+      _StatData(
+        title: 'Total Stations',
+        value: stats.totalStations.toString(),
+        chips: ['${stats.activeStations} Active', '${stats.totalInspectors} Inspectors'],
+        icon: Icons.home_work_outlined,
+        color: appColors.blue,
+      ),
+      _StatData(
+        title: "Today's Inspections",
+        value: stats.todayInspections.toString(),
+        chips: ['${stats.passedInspections} Passed', '${stats.failedInspections} Failed'],
+        icon: Icons.fact_check_outlined,
+        color: appColors.green,
+      ),
+      _StatData(
+        title: 'Total Appointments',
+        value: stats.totalAppointments.toString(),
+        chips: ['${stats.scheduledAppointments} Scheduled', '${stats.completedAppointments} Completed'],
+        icon: Icons.calendar_today_outlined,
+        color: appColors.purple,
+      ),
+      _StatData(
+        title: 'Registered Vehicles',
+        value: stats.totalVehicles.toString(),
+        chips: ['${stats.activeStickers} Active Stickers', '${stats.totalUsers} Users'],
+        icon: Icons.directions_car_outlined,
+        color: appColors.orange,
+      ),
+    ];
+  }
+
+  List<_ActivityData> _mapToActivityData(List<DashboardActivity> activities) {
+    return activities
+        .map((e) => _ActivityData(title: e.title, time: e.time, subtitle: e.subtitle, user: e.user, status: e.status.toLowerCase() == 'pass' ? _ActivityStatus.pass : _ActivityStatus.fail))
+        .toList();
+  }
+
+  List<_StationData> _mapToStationData(List<DashboardTopStation> stations) {
+    return stations.map((e) => _StationData(name: e.name, meta: e.meta, value: e.value)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: appColors.backgroundColor,
-      body: ResponsiveWidget(
-        largeScreen: _DashboardLarge(
-          header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
-          stats: _stats,
-          activities: _activities,
-          stations: _stations,
-          systemStatuses: _systemStatuses,
-        ),
-        mediumScreen: _DashboardLarge(
-          header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
-          stats: _stats,
-          activities: _activities,
-          stations: _stations,
-          systemStatuses: _systemStatuses,
-        ),
-        smallScreen: _DashboardLarge(
-          header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
-          stats: _stats,
-          activities: _activities,
-          stations: _stations,
-          systemStatuses: _systemStatuses,
+    return BlocProvider(
+      create: (context) => DashboardBloc()..add(FetchDashboardData()),
+      child: Scaffold(
+        backgroundColor: appColors.backgroundColor,
+        body: BlocConsumer<DashboardBloc, DashboardState>(
+          listener: (context, state) {
+            if (state is DashboardError) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+          builder: (context, state) {
+            if (state is DashboardLoading) {
+              return const Center(child: LoaderView());
+            } else if (state is DashboardLoaded) {
+              final stats = _mapToStatData(state.stats);
+              final activities = _mapToActivityData(state.activities);
+              final stations = _mapToStationData(state.stations);
+
+              return ResponsiveWidget(
+                largeScreen: _DashboardLarge(
+                  header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
+                  stats: stats,
+                  activities: activities,
+                  stations: stations,
+                  // systemStatuses: _systemStatuses,
+                ),
+                mediumScreen: _DashboardLarge(
+                  header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
+                  stats: stats,
+                  activities: activities,
+                  stations: stations,
+                  // systemStatuses: _systemStatuses,
+                ),
+                smallScreen: _DashboardLarge(
+                  header: _DashboardHeader(dateText: _formatDate(DateTime.now())),
+                  stats: stats,
+                  activities: activities,
+                  stations: stations,
+                  // systemStatuses: _systemStatuses,
+                ),
+              );
+            }
+            return const Center(child: Text('No data available'));
+          },
         ),
       ),
     );
@@ -120,8 +165,8 @@ class _DashboardLarge extends StatelessWidget {
   final List<_StatData> stats;
   final List<_ActivityData> activities;
   final List<_StationData> stations;
-  final List<_StatusData> systemStatuses;
-  const _DashboardLarge({required this.header, required this.stats, required this.activities, required this.stations, required this.systemStatuses});
+  // final List<_StatusData> systemStatuses;
+  const _DashboardLarge({required this.header, required this.stats, required this.activities, required this.stations});
 
   @override
   Widget build(BuildContext context) {
@@ -145,12 +190,12 @@ class _DashboardLarge extends StatelessWidget {
                   children: [
                     _SectionCard(
                       title: 'Recent Activity',
-                      child: _ActivityList(items: activities),
+                      child: activities.isNotEmpty ? _ActivityList(items: activities) : Center(child: Text('No activities available')),
                     ),
                     SizedBox(width: s.s16),
                     _SectionCard(
                       title: 'Top Performing Stations',
-                      child: _TopStations(items: stations),
+                      child: stations.isNotEmpty ? _TopStations(items: stations) : Center(child: Text('No stations available')),
                     ),
                   ],
                 )
@@ -160,14 +205,14 @@ class _DashboardLarge extends StatelessWidget {
                     Expanded(
                       child: _SectionCard(
                         title: 'Recent Activity',
-                        child: _ActivityList(items: activities),
+                        child: activities.isNotEmpty ? _ActivityList(items: activities) : Center(child: Text('No activities available')),
                       ),
                     ),
                     SizedBox(width: s.s16),
                     Expanded(
                       child: _SectionCard(
                         title: 'Top Performing Stations',
-                        child: _TopStations(items: stations),
+                        child: stations.isNotEmpty ? _TopStations(items: stations) : Center(child: Text('No stations available')),
                       ),
                     ),
                   ],
@@ -186,6 +231,7 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 400,
       decoration: boxDecorationWithRoundedCorners(
         borderRadius: BorderRadius.circular(16),
         backgroundColor: appColors.surfaceColor,
@@ -402,8 +448,8 @@ class _StationData {
   _StationData({required this.name, required this.meta, required this.value});
 }
 
-class _StatusData {
-  final String label;
-  final bool ok;
-  _StatusData({required this.label, required this.ok});
-}
+// class _StatusData {
+//   final String label;
+//   final bool ok;
+//   _StatusData({required this.label, required this.ok});
+// }

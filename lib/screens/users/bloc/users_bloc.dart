@@ -30,7 +30,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   Future<void> _onAddUser(AddUserEvent event, Emitter<UsersState> emit) async {
     emit(UsersLoading());
     try {
-      final user = AppUser(cId: '', cName: event.name, cEmail: event.email, cMobileNo: event.phone, cActivationStatus: event.isActive, createTime: DateTime.now(), updateTime: DateTime.now());
+      final user = AppUser(cId: '', cName: event.name, cEmail: event.email, cMobileNo: event.phone, cActivationStatus: event.isActive, createTime: Timestamp.now(), updateTime: Timestamp.now());
       await _repo.addUser(user);
       final users = await _repo.getAllUsers();
       emit(UsersLoaded(users: users));
@@ -42,7 +42,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   Future<void> _onUpdateUser(UpdateUserEvent event, Emitter<UsersState> emit) async {
     emit(UsersLoading());
     try {
-      final updated = event.user.copyWith(cName: event.name, cEmail: event.email, cMobileNo: event.phone, cActivationStatus: event.isActive, updateTime: DateTime.now());
+      final updated = event.user.copyWith(cName: event.name, cEmail: event.email, cMobileNo: event.phone, cActivationStatus: event.isActive, updateTime: Timestamp.now());
       await _repo.setUser(event.user.cId!, updated);
       final users = await _repo.getAllUsers();
       emit(UsersLoaded(users: users));
