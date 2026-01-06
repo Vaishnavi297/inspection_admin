@@ -39,8 +39,8 @@ class _HomePageState extends State<HomePage> {
         return BlocProvider(create: (context) => UsersBloc(), child: const UsersPage());
       case 5:
         return BlocProvider(create: (context) => VehiclesBloc(), child: const VehiclesPage());
-      case 6:
-        return _SectionPlaceholder(title: 'Settings');
+      // case 6:
+      //   return _SectionPlaceholder(title: 'Settings');
       default:
         return const SizedBox();
     }

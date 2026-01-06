@@ -99,7 +99,7 @@ class DashboardRepository {
         fromFirestore: (data, id) {
           return DashboardTopStation(
             name: data['station_name'] ?? 'Unknown',
-            meta: '${data['station_county_name'] ?? 'Unknown County'} • ${(data['max_inspectors'] ?? 0)} Inspectors',
+            meta: '${data['s_county_details']['county_name'] ?? 'Unknown County'} • ${(data['max_inspectors'] ?? 0)} Inspectors',
             value: '${(data['total_inspections'] ?? 0)}', // Assuming a counter exists, else 0
           );
         },

@@ -39,7 +39,7 @@ class _DashboardPageState extends State<DashboardPage> {
   // ];
 
   String _formatDate(DateTime dt) {
-    return DateFormat(' d, MMMM EEEE, yyyy').format(dt);
+    return DateFormat('EEEE, MMMM d, yyyy').format(dt);
   }
 
   List<_StatData> _mapToStatData(DashboardStats stats) {
