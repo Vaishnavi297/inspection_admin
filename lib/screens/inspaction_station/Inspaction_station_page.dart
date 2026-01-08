@@ -103,8 +103,41 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
       final idText = station.stationId ?? '-';
       final address = station.stationAddress ?? '-';
       final county = station.sCountyDetails?.countyName ?? '-';
-      final hours = (station.workingHours != null && station.workingHours!.isNotEmpty) ? '${station.workingHours!.keys.first} - ${station.workingHours!.keys.last}' : '-';
-      final max = station.maxInspectors ?? 0;
+      final daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+      final dayLabels = {'mon': 'MON', 'tue': 'TUE', 'wed': 'WED', 'thu': 'THU', 'fri': 'FRI', 'sat': 'SAT', 'sun': 'SUN'};
+      String hours;
+      WorkingHours? parsedWorkingHours;
+      if (station.workingHours != null) {
+        final dynamic raw = station.workingHours;
+        if (raw is WorkingHours) {
+          parsedWorkingHours = raw;
+        } else if (raw is Map) {
+          parsedWorkingHours = WorkingHours.fromJson(Map<String, dynamic>.from(raw));
+        }
+      }
+
+      if (parsedWorkingHours == null) {
+        hours = '-';
+      } else {
+        if (parsedWorkingHours.weeklySchedule.isNotEmpty) {
+          final ordered = daysOrder.where((d) => (parsedWorkingHours!.weeklySchedule[d] ?? const []).isNotEmpty).toList();
+          if (ordered.isNotEmpty) {
+            final first = dayLabels[ordered.first]!;
+            final last = dayLabels[ordered.last]!;
+            hours = ordered.length > 1 ? '$first - $last' : first;
+          } else {
+            hours = '-';
+          }
+        } else if (parsedWorkingHours.selectedDays.isNotEmpty) {
+          final ordered = daysOrder.where((d) => parsedWorkingHours!.selectedDays.contains(d)).toList();
+          final first = dayLabels[ordered.first]!;
+          final last = dayLabels[ordered.last]!;
+          hours = ordered.length > 1 ? '$first - $last' : first;
+        } else {
+          hours = '-';
+        }
+      }  
+      final max = station.inspactors ?? 0;  
       final current = 0;
       final inspectors = '$current/$max';
       final active = station.stationActivationStatus == true ? 'Active' : 'Inactive';
@@ -163,7 +196,7 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
     );
     if (result is InspactionStation) {
       context.read<InspactionStationBloc>().add(
-        UpdateInspactionStationEvent(station: result, stationName: result.stationName, stationLowerName: result.stationName.toLowerCase(), maxInspectors: result.maxInspectors ?? 0),
+        UpdateInspactionStationEvent(station: result, stationName: result.stationName, stationLowerName: result.stationName.toLowerCase(), inspactors: result.inspactors ?? 0),
       );
     }
   }

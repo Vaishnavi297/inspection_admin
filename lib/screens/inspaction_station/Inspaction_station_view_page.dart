@@ -15,20 +15,40 @@ class InspactionStationViewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     final dayLabels = {'mon': 'MON', 'tue': 'TUE', 'wed': 'WED', 'thu': 'THU', 'fri': 'FRI', 'sat': 'SAT', 'sun': 'SUN'};
-    String formatHours(Map<String, dynamic>? hours) {
-      if (hours == null || hours.isEmpty) return '-';
-      final entries = <String>[];
-      for (final d in daysOrder) {
-        final h = hours[d];
-        if (h is Map && h['closed'] != true) {
-          final s = h['start'];
-          final e = h['end'];
-          if (s is String && e is String) {
-            entries.add('${dayLabels[d]} $s-$e');
+    String formatHours(dynamic hours) {
+      if (hours == null) return '-';
+      WorkingHours? parsed;
+      if (hours is WorkingHours) {
+        parsed = hours;
+      } else if (hours is Map) {
+        parsed = WorkingHours.fromJson(Map<String, dynamic>.from(hours));
+      } else {
+        return '-';
+      }
+      if (parsed.weeklySchedule.isNotEmpty) {
+        final entries = <String>[];
+        for (final d in daysOrder) {
+          final ranges = parsed.weeklySchedule[d] ?? const [];
+          if (ranges.isNotEmpty) {
+            final parts = ranges.map((r) => '${r.open}-${r.close}').toList();
+            entries.add('${dayLabels[d]} ${parts.join(', ')}');
           }
         }
+        return entries.isEmpty ? '-' : entries.join(', ');
+      } else {
+        if (parsed.selectedDays.isEmpty) return '-';
+        final entries = <String>[];
+        for (final d in daysOrder) {
+          if (parsed.selectedDays.contains(d)) {
+            final s = parsed.startTimes[d];
+            final e = parsed.endTimes[d];
+            if (s != null && e != null) {
+              entries.add('${dayLabels[d]} $s-$e');
+            }
+          }
+        }
+        return entries.isEmpty ? '-' : entries.join(', ');
       }
-      return entries.isEmpty ? '-' : entries.join(', ');
     }
 
     final title = station.stationName;

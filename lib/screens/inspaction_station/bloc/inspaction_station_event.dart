@@ -21,9 +21,9 @@ class UpdateInspactionStationEvent extends InspactionStationEvent {
   final InspactionStation station;
   final String stationName;
   final String stationLowerName;
-  final int maxInspectors;
+  final int inspactors;
 
-  const UpdateInspactionStationEvent({required this.station, required this.stationName, required this.stationLowerName, required this.maxInspectors});
+  const UpdateInspactionStationEvent({required this.station, required this.stationName, required this.stationLowerName, required this.inspactors});
 }
 
 class DeleteInspactionStationEvent extends InspactionStationEvent {

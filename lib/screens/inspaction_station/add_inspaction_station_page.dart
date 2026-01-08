@@ -30,12 +30,14 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
   final TextEditingController _stationNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _maxInspectorsController = TextEditingController(text: '1');
+ // final TextEditingController _maxInspectorsController = TextEditingController(text: '1');
   final TextEditingController _descriptionController = TextEditingController();
 
   County? _selectedCounty;
   String? _selectedCountyId;
   bool _active = true;
+
+  String? stationCountry="+91";
 
   @override
   void initState() {
@@ -45,7 +47,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
       _stationNameController.text = widget.station!.stationName;
       _addressController.text = widget.station!.stationAddress ?? '';
       _phoneController.text = widget.station!.stationContactNumber ?? '';
-      _maxInspectorsController.text = (widget.station!.maxInspectors ?? 1).toString();
+     // _maxInspectorsController.text = (widget.station!.inspactors ?? 1).toString();
       _descriptionController.text = widget.station!.stationDescription ?? '';
       _active = widget.station!.stationActivationStatus ?? true;
       _selectedCounty = widget.station!.sCountyDetails;
@@ -59,7 +61,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
     _stationNameController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
-    _maxInspectorsController.dispose();
+  //  _maxInspectorsController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -67,7 +69,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => WorkingHoursBloc().seedFromJson(widget.station?.workingHours),
+      create: (_) => WorkingHoursBloc(widget.station?.workingHours),
       child: Builder(
         builder: (dialogContext) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -152,30 +154,38 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
                             ),
                           ),
                           Expanded(
-                            child: textField(controller: _phoneController, labelText: 'Phone *', hintText: '(304) 555-0123', validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null),
-                          ),
-                        ],
-                      ),
-                      _WorkingHoursSection(),
-                      Row(
-                        spacing: s.s16,
-                        children: [
-                          Expanded(
                             child: textField(
-                              controller: _maxInspectorsController,
-                              labelText: 'Max Inspectors',
-                              hintText: '5',
-                              inputType: TextInputType.number,
-                              validator: (v) {
-                                if (v == null || v.trim().isEmpty) return null;
-                                final n = int.tryParse(v.trim());
-                                if (n == null || n <= 0) return 'Invalid number';
-                                return null;
-                              },
+                              controller: _phoneController,
+                              labelText: 'Phone *',
+                              hintText: '(304) 555-0123',
+                              prefix:  Text(stationCountry ?? '', style: primaryTextStyle()),
+                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                             ),
                           ),
-                        ],
-                      ),
+                        
+                      ],
+                    ),
+                    _WorkingHoursSection(),
+
+                      // Row(
+                      //   spacing: s.s16,
+                      //   children: [
+                      //     Expanded(
+                      //       child: textField(
+                      //         controller: _maxInspectorsController,
+                      //         labelText: 'Max Inspectors',
+                      //         hintText: '5',
+                      //         inputType: TextInputType.number,
+                      //         validator: (v) {
+                      //           if (v == null || v.trim().isEmpty) return null;
+                      //           final n = int.tryParse(v.trim());
+                      //           if (n == null || n <= 0) return 'Invalid number';
+                      //           return null;
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                       textField(controller: _descriptionController, labelText: 'Description', hintText: 'Additional details about this station', maxLines: 4),
                       Row(
                         children: [
@@ -215,6 +225,11 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
 
     final hoursBloc = dialogContext.read<WorkingHoursBloc>();
     hoursBloc.add(const ValidateEvent());
+
+    // Wait for the validation event to be processed and state to update
+    // Skip the current state and wait for the next one (after validation)
+    await hoursBloc.stream.skip(1).first;
+
     final errors = hoursBloc.state.errors;
     if (errors.isNotEmpty) {
       final first = errors.entries.first;
@@ -222,9 +237,23 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
       return;
     }
 
-    final apiHours = hoursBloc.toApiJson();
+    final apiHours = hoursBloc.toWorkingHours();
 
-    final phone = _phoneController.text.trim();
+    String _normalizePhoneWithCountry(String input, String? countryCode) {
+      final cc = (countryCode ?? '').trim();
+      final cleanedCc = cc.startsWith('+') ? cc : (cc.isEmpty ? '+1' : '+$cc');
+      final raw = input.trim();
+      if (raw.isEmpty) return '';
+      if (raw.startsWith('+')) return raw.replaceAll(RegExp(r'[^+0-9]'), '');
+      final digits = raw.replaceAll(RegExp(r'\D'), '');
+      if (digits.isEmpty) return '';
+      if (digits.length > 0 && cleanedCc == '+1') {
+        if (digits.length == 11 && digits.startsWith('1')) return '+$digits';
+        if (digits.length == 10) return '$cleanedCc$digits';
+      }
+      return '$cleanedCc$digits';
+    }
+    final phone = _normalizePhoneWithCountry(_phoneController.text, stationCountry);
     String? authUid;
     if (phone.isNotEmpty) {
       try {
@@ -250,9 +279,9 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
       // stationNameLower: _stationNameController.text.trim().toLowerCase(),
       stationAuthUid: authUid,
       stationAddress: _addressController.text.trim(),
-      stationContactNumber: _phoneController.text.trim(),
+      stationContactNumber: phone,
       sCountyDetails: _selectedCounty!,
-      maxInspectors: int.tryParse(_maxInspectorsController.text.trim() == '' ? '0' : _maxInspectorsController.text.trim()) ?? 0,
+    //  inspactors: int.tryParse(_maxInspectorsController.text.trim() == '' ? '0' : _maxInspectorsController.text.trim()) ?? 0,
       stationDescription: _descriptionController.text.trim(),
       stationActivationStatus: _active,
       createTime: Timestamp.fromDate(DateTime.now()),
@@ -302,100 +331,216 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
 class _WorkingHoursSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 20, bottom: 12),
-          child: Text(
+    return Padding(
+      padding: EdgeInsets.only(top: s.s20),
+      child: Column(
+      
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Apply All Section (replaces timezone section)
+          Text(
             'Working Hours',
             style: GoogleFonts.ptSans(fontSize: FontSize.s14, color: appColors.textSecondaryColor, fontWeight: FontWeight.w500),
           ),
-        ),
-        Wrap(
-          spacing: s.s8,
-          runSpacing: s.s8,
-          children: WorkingHoursBloc.daysOrder.map((day) => _DayChip(day: day)).toList(),
-        ),
-        SizedBox(height: s.s12),
-        BlocBuilder<WorkingHoursBloc, WorkingHoursState>(
-          builder: (context, state) {
-            final selected = state.selectedDays.toList();
-            return Column(children: selected.map((day) => _DayTimeRow(day: day)).toList());
-          },
-        ),
-      ],
-    );
-  }
-}
 
-class _DayChip extends StatelessWidget {
-  final String day;
-  const _DayChip({required this.day});
+          BlocBuilder<WorkingHoursBloc, WorkingHoursState>(
+            buildWhen: (previous, current) => previous.selectedDays.length != current.selectedDays.length,
+            builder: (context, state) {
+              // Show button only when at least 1 day is selected
+              if (state.selectedDays.isNotEmpty) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: s.s12),
+                          Text(
+                            'Apply All',
+                            style:primaryTextStyle(size: FontSize.s14),
+                          ),
+                          SizedBox(height: s.s4),
+                          Text(
+                            'Apply Schedule like selected day',
+                            style: secondaryTextStyle(size: FontSize.s12, color: appColors.textSecondaryColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                    AppButton(onTap: () => context.read<WorkingHoursBloc>().add(const SelectAllEvent()), width: 150, height: 35,
+                      backgroundColor: appColors.transparent,
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<WorkingHoursBloc, WorkingHoursState>(
-      buildWhen: (p, n) => p.selectedDays.contains(day) != n.selectedDays.contains(day),
-      builder: (context, state) {
-        final selected = state.selectedDays.contains(day);
-        return ChoiceChip(selected: selected, label: Text(WorkingHoursBloc.dayLabels[day]!), onSelected: (_) => context.read<WorkingHoursBloc>().add(ToggleDayEvent(day)));
-      },
-    );
-  }
-}
-
-class _DayTimeRow extends StatelessWidget {
-  final String day;
-  const _DayTimeRow({required this.day});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: s.s6),
-      child: Row(
-        children: [
-          SizedBox(width: 60, child: Text(WorkingHoursBloc.dayLabels[day]!, style: primaryTextStyle())),
-          SizedBox(width: s.s8),
-          _TimeChip(day: day, isStart: true),
-          SizedBox(width: s.s8),
-          _TimeChip(day: day, isStart: false),
+                      borderColor: appColors.primaryColor, 
+                      isBorderEnable: true,
+                      btnWidget: Text('Apply Weekly Schedule', style: secondaryTextStyle(color: appColors.primaryTextColor)),
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          SizedBox(height: s.s12),
+          // Week Days List
+          BlocBuilder<WorkingHoursBloc, WorkingHoursState>(
+            builder: (context, state) {
+              return Column(children: WorkingHoursBloc.daysOrder.map((day) => _WeekDayRow(day: day)).toList());
+            },
+          ),
         ],
       ),
     );
   }
 }
 
-class _TimeChip extends StatelessWidget {
+class _WeekDayRow extends StatelessWidget {
   final String day;
-  final bool isStart;
-  const _TimeChip({required this.day, required this.isStart});
+  const _WeekDayRow({required this.day});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WorkingHoursBloc, WorkingHoursState>(
+      buildWhen: (previous, current) =>
+          previous.selectedDays.contains(day) != current.selectedDays.contains(day) || previous.startTimes[day] != current.startTimes[day] || previous.endTimes[day] != current.endTimes[day],
       builder: (context, state) {
-        final label = isStart ? 'Start' : 'End';
-        final value = isStart ? state.startTimes[day] : state.endTimes[day];
-        return ActionChip(
-          label: Text(value ?? label),
-          onPressed: () async {
-            final initial = value != null ? TimeOfDay(hour: int.parse(value.split(':')[0]), minute: int.parse(value.split(':')[1])) : const TimeOfDay(hour: 9, minute: 0);
-            final picked = await showTimePicker(context: context, initialTime: initial);
-            if (picked != null) {
-              final hh = picked.hour.toString().padLeft(2, '0');
-              final mm = picked.minute.toString().padLeft(2, '0');
-              final hhmm = '$hh:$mm';
-              final bloc = context.read<WorkingHoursBloc>();
-              if (isStart) {
-                bloc.add(SetStartEvent(day, hhmm));
-              } else {
-                bloc.add(SetEndEvent(day, hhmm));
-              }
-            }
-          },
+        final isSelected = state.selectedDays.contains(day);
+        final startTime = state.startTimes[day];
+        final endTime = state.endTimes[day];
+
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: s.s8),
+          child: Row(
+            children: [
+              // Day name
+              SizedBox(
+                width: 100,
+                child: Text(_getDayFullName(day), style: primaryTextStyle(color: appColors.primaryTextColor)),
+              ),
+              SizedBox(width: s.s12),
+              // Toggle Switch
+              Switch(
+                value: isSelected,
+                onChanged: (value) {
+                  context.read<WorkingHoursBloc>().add(ToggleDayEvent(day));
+                },
+                activeThumbColor: appColors.primaryColor,
+              ),
+              SizedBox(width: s.s16),
+              // Time fields or Closed status
+              if (isSelected) ...[
+                // From field
+                Expanded(
+                  child: _TimeInputField(day: day, isStart: true, label: 'From', value: startTime),
+                ),
+                SizedBox(width: s.s12),
+                // To field
+                Expanded(
+                  child: _TimeInputField(day: day, isStart: false, label: 'To', value: endTime),
+                ),
+              ] else ...[
+                // Closed status
+                Expanded(
+                  child: Container(
+        padding: EdgeInsets.symmetric(horizontal: s.s12, vertical: s.s10),
+        decoration: BoxDecoration(
+          border: Border.all(color: appColors.textSecondaryColor.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.nightlight_outlined, size: 18, color: appColors.textSecondaryColor),
+                        SizedBox(width: s.s8),
+                        Text('Closed', style: secondaryTextStyle(color: appColors.textSecondaryColor)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         );
       },
+    );
+  }
+
+  String _getDayFullName(String day) {
+    const dayNames = {'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'};
+    return dayNames[day] ?? day.toUpperCase();
+  }
+}
+
+class _TimeInputField extends StatelessWidget {
+  final String day;
+  final bool isStart;
+  final String label;
+  final String? value;
+
+  const _TimeInputField({required this.day, required this.isStart, required this.label, required this.value});
+
+  String _formatTime(String? hhmm) {
+    if (hhmm == null || hhmm.isEmpty) return '';
+    try {
+      final parts = hhmm.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+      final displayMinute = minute.toString().padLeft(2, '0');
+      return '$displayHour:$displayMinute $period';
+    } catch (e) {
+      return hhmm;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayValue = _formatTime(value);
+    final isEmpty = value == null || value!.isEmpty;
+
+    return InkWell(
+      onTap: () async {
+        final initial = value != null ? TimeOfDay(hour: int.parse(value!.split(':')[0]), minute: int.parse(value!.split(':')[1])) : const TimeOfDay(hour: 9, minute: 0);
+        final picked = await showTimePicker(context: context, initialTime: initial);
+        if (picked != null) {
+          final hh = picked.hour.toString().padLeft(2, '0');
+          final mm = picked.minute.toString().padLeft(2, '0');
+          final hhmm = '$hh:$mm';
+          final bloc = context.read<WorkingHoursBloc>();
+          if (isStart) {
+            bloc.add(SetStartEvent(day, hhmm));
+          } else {
+            bloc.add(SetEndEvent(day, hhmm));
+          }
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: s.s12, vertical: s.s10),
+        decoration: BoxDecoration(
+          border: Border.all(color: appColors.textSecondaryColor.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              spacing: s.s4,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.ptSans(fontSize: FontSize.s12, color: appColors.textSecondaryColor),
+                ),
+                SizedBox(height: s.s4),
+                Text(isEmpty ? label : displayValue, style: primaryTextStyle(color: isEmpty ? appColors.textSecondaryColor : appColors.primaryTextColor)),
+              ],
+            ),
+            Icon(Icons.access_time, size: 18, color: appColors.textSecondaryColor),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -47,7 +47,7 @@ class InspactionStationBloc extends Bloc<InspactionStationEvent, InspactionStati
         stationName: event.stationName,
         // stationNameLower: event.stationLowerName,
         updateTime: Timestamp.fromDate(DateTime.now()),
-        maxInspectors: event.maxInspectors,
+        // inspactors: event.inspactors, 
         workingHours: event.station.workingHours ?? event.station.workingHours,
       );
       await _repo.setStation(event.station.sId!, updated);

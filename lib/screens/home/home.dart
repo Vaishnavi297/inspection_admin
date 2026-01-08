@@ -72,13 +72,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-class _SectionPlaceholder extends StatelessWidget {
-  final String title;
-  const _SectionPlaceholder({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text(title, style: Theme.of(context).textTheme.titleLarge));
-  }
-}

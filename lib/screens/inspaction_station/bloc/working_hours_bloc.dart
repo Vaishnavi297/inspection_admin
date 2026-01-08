@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../data/data_structure/models/inspaction_station.dart';
 
 class WorkingHoursState extends Equatable {
   final Set<String> selectedDays;
@@ -46,39 +47,40 @@ class SetEndEvent extends WorkingHoursEvent {
   List<Object?> get props => [day, hhmm];
 }
 
+class SelectAllEvent extends WorkingHoursEvent {
+  const SelectAllEvent();
+}
+
 class ValidateEvent extends WorkingHoursEvent {
   const ValidateEvent();
+}
+
+class SeedFromJsonEvent extends WorkingHoursEvent {
+  final WorkingHours? json;
+  const SeedFromJsonEvent(this.json);
+  @override
+  List<Object?> get props => [json];
 }
 
 class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
   static const daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
   static const dayLabels = {'mon': 'MON', 'tue': 'TUE', 'wed': 'WED', 'thu': 'THU', 'fri': 'FRI', 'sat': 'SAT', 'sun': 'SUN'};
 
-  WorkingHoursBloc() : super(const WorkingHoursState()) {
+  WorkingHoursBloc([WorkingHours? initialData]) : super(const WorkingHoursState()) {
     on<ToggleDayEvent>(_onToggleDay);
     on<SetStartEvent>(_onSetStart);
     on<SetEndEvent>(_onSetEnd);
     on<ValidateEvent>(_onValidate);
+    on<SeedFromJsonEvent>(_onSeedFromJson);
+    on<SelectAllEvent>(_onSelectAll);
+    if (initialData != null) {
+      add(SeedFromJsonEvent(initialData));
+    }
   }
 
-  WorkingHoursBloc seedFromJson(Map<String, dynamic>? json) {
-    if (json == null) return this;
-    final selected = <String>{};
-    final starts = <String, String>{};
-    final ends = <String, String>{};
-    for (final day in daysOrder) {
-      final entry = json[day];
-      if (entry is Map && entry['closed'] != true) {
-        selected.add(day);
-        final s = entry['start'];
-        final e = entry['end'];
-        if (s is String) starts[day] = s;
-        if (e is String) ends[day] = e;
-      }
-    }
-    // ignore: invalid_use_of_visible_for_testing_member
-    emit(WorkingHoursState(selectedDays: selected, startTimes: starts, endTimes: ends));
-    return this;
+  void _onSeedFromJson(SeedFromJsonEvent event, Emitter<WorkingHoursState> emit) {
+    if (event.json == null) return;
+    emit(WorkingHoursState(selectedDays: event.json!.selectedDays, startTimes: event.json!.startTimes, endTimes: event.json!.endTimes));
   }
 
   void _onToggleDay(ToggleDayEvent event, Emitter<WorkingHoursState> emit) {
@@ -95,13 +97,69 @@ class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
   void _onSetStart(SetStartEvent event, Emitter<WorkingHoursState> emit) {
     final starts = Map<String, String>.from(state.startTimes);
     starts[event.day] = event.hhmm;
-    emit(state.copyWith(startTimes: starts));
+    final errs = Map<String, String?>.from(state.errors)..remove(event.day);
+    emit(state.copyWith(startTimes: starts, errors: errs));
   }
 
   void _onSetEnd(SetEndEvent event, Emitter<WorkingHoursState> emit) {
     final ends = Map<String, String>.from(state.endTimes);
     ends[event.day] = event.hhmm;
-    emit(state.copyWith(endTimes: ends));
+    final errs = Map<String, String?>.from(state.errors)..remove(event.day);
+    emit(state.copyWith(endTimes: ends, errors: errs));
+  }
+
+  void _onSelectAll(SelectAllEvent event, Emitter<WorkingHoursState> emit) {
+    final allDays = Set<String>.from(daysOrder);
+    
+    // Find the first available start and end time from selected days
+    String? defaultStartTime;
+    String? defaultEndTime;
+    
+    // Look through selected days first to find existing times
+    for (final day in state.selectedDays) {
+      final start = state.startTimes[day];
+      final end = state.endTimes[day];
+      if (start != null && end != null) {
+        defaultStartTime = start;
+        defaultEndTime = end;
+        break;
+      }
+    }
+    
+    // If no times found in selected days, look through all days
+    if (defaultStartTime == null || defaultEndTime == null) {
+      for (final day in daysOrder) {
+        final start = state.startTimes[day];
+        final end = state.endTimes[day];
+        if (start != null && end != null) {
+          defaultStartTime = start;
+          defaultEndTime = end;
+          break;
+        }
+      }
+    }
+    
+    // If still no times found, use default working hours (9:00 - 17:00)
+    final startTime = defaultStartTime ?? '09:00';
+    final endTime = defaultEndTime ?? '17:00';
+    
+    // Apply the same start and end times to all days
+    final allStartTimes = <String, String>{};
+    final allEndTimes = <String, String>{};
+    final clearedErrors = <String, String?>{};
+    
+    for (final day in allDays) {
+      allStartTimes[day] = startTime;
+      allEndTimes[day] = endTime;
+      clearedErrors[day] = null;
+    }
+    
+    emit(state.copyWith(
+      selectedDays: allDays,
+      startTimes: allStartTimes,
+      endTimes: allEndTimes,
+      errors: clearedErrors,
+    ));
   }
 
   void _onValidate(ValidateEvent event, Emitter<WorkingHoursState> emit) {
@@ -114,23 +172,15 @@ class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
         errs[day] = 'Select start and end time';
         continue;
       }
-      if (!_isEndAfterStart(s, e) == false) {
+      if (!_isEndAfterStart(s, e)) {
         errs[day] = 'End time must be after start';
       }
     }
     emit(state.copyWith(errors: errs));
   }
 
-  Map<String, dynamic> toApiJson() {
-    final map = <String, dynamic>{};
-    for (final day in daysOrder) {
-      if (state.selectedDays.contains(day)) {
-        map[day] = {'start': state.startTimes[day], 'end': state.endTimes[day], 'closed': false};
-      } else {
-        map[day] = {'closed': true};
-      }
-    }
-    return map;
+  WorkingHours toWorkingHours() {
+    return WorkingHours(selectedDays: state.selectedDays, startTimes: state.startTimes, endTimes: state.endTimes);
   }
 
   static bool _isEndAfterStart(String s, String e) {
@@ -140,7 +190,6 @@ class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
       final m = int.tryParse(parts[1]) ?? 0;
       return h * 60 + m;
     }
-
     return _toMinutes(e) > _toMinutes(s);
   }
 }

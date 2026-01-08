@@ -26,7 +26,7 @@ class InspactionStation {
   final bool? stationAvailabilityStatus;
   final bool? stationDocumentsVerificationStatus;
   final bool? stationActivationStatus;
-  final int? maxInspectors;
+  final int? inspactors;
 
   // final String? startTime;
   // final String? endTime;
@@ -35,7 +35,7 @@ class InspactionStation {
   final Timestamp? updateTime;
 
   final String? stationDescription;
-  final Map<String, dynamic>? workingHours;
+  final WorkingHours? workingHours;
 
   const InspactionStation({
     this.sId,
@@ -56,7 +56,7 @@ class InspactionStation {
     this.stationAvailabilityStatus = false,
     this.stationDocumentsVerificationStatus,
     this.stationActivationStatus = false,
-    this.maxInspectors,
+    this.inspactors,
     // this.startTime,
     // this.endTime,
     this.createTime,
@@ -69,6 +69,10 @@ class InspactionStation {
   /// From JSON
   /// -----------------------------
   factory InspactionStation.fromJson(Map<String, dynamic> json) {
+    final whRaw = json['working_hours'];
+    final WorkingHours? wh = (whRaw is Map)
+        ? WorkingHours.fromJson(Map<String, dynamic>.from(whRaw))
+        : (whRaw is WorkingHours ? whRaw : null);
     return InspactionStation(
       sId: json['sId'],
       stationId: json['station_id'],
@@ -93,7 +97,7 @@ class InspactionStation {
       stationAvailabilityStatus: json['station_availability_status'],
       stationDocumentsVerificationStatus: json['station_documents_verification_status'],
       stationActivationStatus: json['station_activation_status'],
-      maxInspectors: json['max_inspectors'] != null ? (json['max_inspectors'] as num).toInt() : null,
+      inspactors: json['inspactors'] != null ? (json['inspactors'] as num).toInt() : null,
 
       // startTime:
       // json['start_time'] != null
@@ -106,7 +110,7 @@ class InspactionStation {
       createTime: json['create_time'] != null ? (json['create_time'] as Timestamp) : null,
       updateTime: json['update_time'] != null ? (json['update_time'] as Timestamp) : null,
       stationDescription: json['station_description'],
-      workingHours: (json['working_hours'] as Map?)?.map((k, v) => MapEntry(k as String, v)),
+      workingHours: wh,
     );
   }
 
@@ -133,13 +137,13 @@ class InspactionStation {
       'station_availability_status': stationAvailabilityStatus,
       'station_documents_verification_status': stationDocumentsVerificationStatus,
       'station_activation_status': stationActivationStatus,
-      'max_inspectors': maxInspectors,
+      'inspactors': inspactors,
       // 'start_time': startTime,
       // 'end_time': endTime,
       'create_time': createTime?.toDate(),
       'update_time': updateTime?.toDate(),
       'station_description': stationDescription,
-      'working_hours': workingHours,
+      'working_hours': workingHours?.toJson(),
     };
   }
 
@@ -165,14 +169,14 @@ class InspactionStation {
     bool? stationAvailabilityStatus,
     bool? stationDocumentsVerificationStatus,
     bool? stationActivationStatus,
-    int? maxInspectors,
+    int? inspactors,
     // String? startTime,
     // String? endTime,
     Timestamp? createTime,
     Timestamp? updateTime,
 
     String? stationDescription,
-    Map<String, dynamic>? workingHours,
+    WorkingHours? workingHours,
   }) {
     return InspactionStation(
       sId: sId ?? this.sId,
@@ -193,7 +197,7 @@ class InspactionStation {
       stationAvailabilityStatus: stationAvailabilityStatus ?? this.stationAvailabilityStatus,
       stationDocumentsVerificationStatus: stationDocumentsVerificationStatus ?? this.stationDocumentsVerificationStatus,
       stationActivationStatus: stationActivationStatus ?? this.stationActivationStatus,
-      maxInspectors: maxInspectors ?? this.maxInspectors,
+      inspactors: inspactors ?? this.inspactors,
       // startTime: startTime ?? this.startTime,
       // endTime: endTime ?? this.endTime,
       createTime: createTime ?? this.createTime,
@@ -208,20 +212,100 @@ class WorkingHours {
   final Set<String> selectedDays;
   final Map<String, String> startTimes;
   final Map<String, String> endTimes;
+  final Map<String, List<DayInterval>> weeklySchedule;
 
-  const WorkingHours({required this.selectedDays, required this.startTimes, required this.endTimes});
+  const WorkingHours({required this.selectedDays, required this.startTimes, required this.endTimes, this.weeklySchedule = const {}});
 
-  /// -----------------------------
-  /// To JSON
-  /// -----------------------------
   Map<String, dynamic> toJson() {
-    return {'selected_days': selectedDays.toList(), 'start_times': startTimes, 'end_times': endTimes};
+    if (weeklySchedule.isNotEmpty) {
+      final map = <String, dynamic>{};
+      weeklySchedule.forEach((day, ranges) {
+        map[day] = ranges.map((r) => r.toJson()).toList();
+      });
+      return {'weeklySchedule': map};
+    }
+    final days = selectedDays.toList();
+    final ws = <String, List<DayInterval>>{};
+    for (final d in days) {
+      final s = startTimes[d];
+      final e = endTimes[d];
+      if (s != null && e != null) {
+        ws[d] = [DayInterval(open: s, close: e)];
+      }
+    }
+    final map = <String, dynamic>{};
+    ws.forEach((day, ranges) {
+      map[day] = ranges.map((r) => r.toJson()).toList();
+    });
+    return {'weeklySchedule': map};
   }
 
-  /// -----------------------------
-  /// From JSON
-  /// -----------------------------
   factory WorkingHours.fromJson(Map<String, dynamic> json) {
-    return WorkingHours(selectedDays: Set.from(json['selected_days']), startTimes: Map.from(json['start_times']), endTimes: Map.from(json['end_times']));
+    if (json.containsKey('weeklySchedule')) {
+      final wsRaw = Map<String, dynamic>.from(json['weeklySchedule'] ?? const {});
+      final ws = <String, List<DayInterval>>{};
+      final selected = <String>{};
+      final starts = <String, String>{};
+      final ends = <String, String>{};
+      wsRaw.forEach((day, list) {
+        final ranges = (list as List? ?? const <dynamic>[]).map((e) => DayInterval.fromJson(Map<String, dynamic>.from(e))).toList();
+        ws[day] = ranges;
+        if (ranges.isNotEmpty) {
+          selected.add(day);
+          starts[day] = ranges.first.open;
+          ends[day] = ranges.first.close;
+        }
+      });
+      return WorkingHours(selectedDays: selected, startTimes: starts, endTimes: ends, weeklySchedule: ws);
+    } else if (json.containsKey('selected_days')) {
+      final selected = Set<String>.from(json['selected_days'] ?? const []);
+      final starts = Map<String, String>.from(json['start_times'] ?? const {});
+      final ends = Map<String, String>.from(json['end_times'] ?? const {});
+      final ws = <String, List<DayInterval>>{};
+      for (final d in selected) {
+        final s = starts[d];
+        final e = ends[d];
+        if (s != null && e != null) {
+          ws[d] = [DayInterval(open: s, close: e)];
+        }
+      }
+      return WorkingHours(selectedDays: selected, startTimes: starts, endTimes: ends, weeklySchedule: ws);
+    } else {
+      final selected = <String>{};
+      final starts = <String, String>{};
+      final ends = <String, String>{};
+      final ws = <String, List<DayInterval>>{};
+      const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+      for (final d in days) {
+        final entry = json[d];
+        if (entry is Map) {
+          final closed = entry['closed'] == true;
+          if (!closed) {
+            selected.add(d);
+            final s = entry['start'];
+            final e = entry['end'];
+            if (s != null) starts[d] = s.toString();
+            if (e != null) ends[d] = e.toString();
+            if (s != null && e != null) {
+              ws[d] = [DayInterval(open: s.toString(), close: e.toString())];
+            }
+          }
+        }
+      }
+      return WorkingHours(selectedDays: selected, startTimes: starts, endTimes: ends, weeklySchedule: ws);
+    }
+  }
+}
+
+class DayInterval {
+  final String open;
+  final String close;
+  const DayInterval({required this.open, required this.close});
+  Map<String, dynamic> toJson() {
+    return {'open': open, 'close': close};
+  }
+
+  factory DayInterval.fromJson(Map<String, dynamic> json) {
+    return DayInterval(open: json['open']?.toString() ?? '', close: json['close']?.toString() ?? '');
   }
 }

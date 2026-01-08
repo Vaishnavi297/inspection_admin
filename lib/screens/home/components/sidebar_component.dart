@@ -64,7 +64,6 @@ class _SidebarComponentState extends State<SidebarComponent> {
                   navItemWidget(title: 'Users', icon: Icons.people_outline, index: 4),
                   navItemWidget(title: 'Vehicles', icon: Icons.directions_car_outlined, index: 5),
 
-                  navItemWidget(title: 'Settings', icon: Icons.settings_outlined, index: 6, isTrailingIcon: false),
                 ],
               ),
             ),
