@@ -9,7 +9,9 @@ part 'inspactor_states.dart';
 class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
   final InspectorRepository _repo;
 
-  InspactorBloc() : _repo = InspectorRepository.instance, super(InspactorInitial()) {
+  InspactorBloc()
+    : _repo = InspectorRepository.instance,
+      super(InspactorInitial()) {
     on<FetchInspactorsEvent>(_onFetch);
     on<AddInspactorEvent>(_onAdd);
     on<UpdateInspactorEvent>(_onUpdate);
@@ -17,7 +19,10 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
     on<ToggleActiveEvent>(_onToggleActive);
   }
 
-  Future<void> _onFetch(FetchInspactorsEvent event, Emitter<InspactorState> emit) async {
+  Future<void> _onFetch(
+    FetchInspactorsEvent event,
+    Emitter<InspactorState> emit,
+  ) async {
     emit(InspactorLoading());
     try {
       final list = await _repo.getAllInspectors();
@@ -27,7 +32,10 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
     }
   }
 
-  Future<void> _onAdd(AddInspactorEvent event, Emitter<InspactorState> emit) async {
+  Future<void> _onAdd(
+    AddInspactorEvent event,
+    Emitter<InspactorState> emit,
+  ) async {
     emit(InspactorLoading());
     try {
       final inspector = Inspector(
@@ -43,7 +51,7 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       );
-      await _repo.addInspector(inspector);
+      await _repo.createInspectorTransaction(inspector);
       final list = await _repo.getAllInspectors();
       emit(InspactorLoaded(list));
     } catch (e) {
@@ -51,7 +59,10 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
     }
   }
 
-  Future<void> _onUpdate(UpdateInspactorEvent event, Emitter<InspactorState> emit) async {
+  Future<void> _onUpdate(
+    UpdateInspactorEvent event,
+    Emitter<InspactorState> emit,
+  ) async {
     emit(InspactorLoading());
     try {
       final updated = event.inspector.copyWith(
@@ -64,7 +75,7 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
         stationName: event.stationName,
         updatedAt: Timestamp.now(),
       );
-      await _repo.setInspector(event.inspector.inspectorId!, updated);
+      await _repo.updateInspectorTransaction(updated);
       final list = await _repo.getAllInspectors();
       emit(InspactorLoaded(list));
     } catch (e) {
@@ -72,10 +83,13 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
     }
   }
 
-  Future<void> _onDelete(DeleteInspactorEvent event, Emitter<InspactorState> emit) async {
+  Future<void> _onDelete(
+    DeleteInspactorEvent event,
+    Emitter<InspactorState> emit,
+  ) async {
     emit(InspactorLoading());
     try {
-      await _repo.deleteInspector(event.inspectorId);
+      await _repo.deleteInspectorTransaction(event.inspectorId);
       final list = await _repo.getAllInspectors();
       emit(InspactorLoaded(list));
     } catch (e) {
@@ -83,7 +97,10 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
     }
   }
 
-  Future<void> _onToggleActive(ToggleActiveEvent event, Emitter<InspactorState> emit) async {
+  Future<void> _onToggleActive(
+    ToggleActiveEvent event,
+    Emitter<InspactorState> emit,
+  ) async {
     emit(InspactorLoading());
     try {
       await _repo.toggleActive(event.inspectorId, event.isActive);
