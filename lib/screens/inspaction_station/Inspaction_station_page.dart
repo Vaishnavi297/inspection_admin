@@ -34,7 +34,12 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
       body: BlocConsumer<InspactionStationBloc, InspactionStationState>(
         listener: (context, state) {
           if (state is InspactionStationError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMessage), backgroundColor: appColors.errorColor));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage),
+                backgroundColor: appColors.errorColor,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -51,12 +56,19 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
                       children: [
                         Text(
                           'Inspaction Station Management',
-                          style: boldTextStyle(size: FontSize.s20, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
+                          style: boldTextStyle(
+                            size: FontSize.s20,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.primaryTextColor,
+                          ),
                         ),
                         SizedBox(height: s.s4),
                         Text(
                           'Manage stations across West Virginia',
-                          style: secondaryTextStyle(size: FontSize.s12, color: appColors.secondaryTextColor),
+                          style: secondaryTextStyle(
+                            size: FontSize.s12,
+                            color: appColors.secondaryTextColor,
+                          ),
                         ),
                       ],
                     ),
@@ -66,14 +78,20 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
                       },
                       width: 160,
                       height: 40,
-                      btnWidget: Text('Add New Inspaction Station', style: boldTextStyle(size: FontSize.s14)),
+                      btnWidget: Text(
+                        'Add New Inspaction Station',
+                        style: boldTextStyle(size: FontSize.s14),
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: s.s16),
                 if (state is InspactionStationLoading)
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   )
                 else if (state is InspactionStationLoaded)
                   // Text('${state.inspactionStations.length} stations found')
@@ -82,12 +100,18 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
                   Center(
                     child: Padding(
                       padding: EdgeInsets.all(s.s40),
-                      child: Text('Error loading counties: ${state.errorMessage}', style: secondaryTextStyle(color: appColors.errorColor)),
+                      child: Text(
+                        'Error loading counties: ${state.errorMessage}',
+                        style: secondaryTextStyle(color: appColors.errorColor),
+                      ),
                     ),
                   )
                 else
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   ),
               ],
             ),
@@ -98,13 +122,29 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
   }
 
   Widget dataTableWidget(List<InspactionStation> stations) {
-    final columns = ['Station ID', 'Station Name', 'Address', 'County', 'Hours', 'Inspectors', 'Status'];
+    final columns = [
+      'Station ID',
+      'Station Name',
+      'Address',
+      'County',
+      'Hours',
+      'Inspectors',
+      'Status',
+    ];
     final data = stations.map((station) {
       final idText = station.stationId ?? '-';
       final address = station.stationAddress ?? '-';
       final county = station.sCountyDetails?.countyName ?? '-';
       final daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-      final dayLabels = {'mon': 'MON', 'tue': 'TUE', 'wed': 'WED', 'thu': 'THU', 'fri': 'FRI', 'sat': 'SAT', 'sun': 'SUN'};
+      final dayLabels = {
+        'mon': 'MON',
+        'tue': 'TUE',
+        'wed': 'WED',
+        'thu': 'THU',
+        'fri': 'FRI',
+        'sat': 'SAT',
+        'sun': 'SUN',
+      };
       String hours;
       WorkingHours? parsedWorkingHours;
       if (station.workingHours != null) {
@@ -112,7 +152,9 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
         if (raw is WorkingHours) {
           parsedWorkingHours = raw;
         } else if (raw is Map) {
-          parsedWorkingHours = WorkingHours.fromJson(Map<String, dynamic>.from(raw));
+          parsedWorkingHours = WorkingHours.fromJson(
+            Map<String, dynamic>.from(raw),
+          );
         }
       }
 
@@ -120,7 +162,12 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
         hours = '-';
       } else {
         if (parsedWorkingHours.weeklySchedule.isNotEmpty) {
-          final ordered = daysOrder.where((d) => (parsedWorkingHours!.weeklySchedule[d] ?? const []).isNotEmpty).toList();
+          final ordered = daysOrder
+              .where(
+                (d) => (parsedWorkingHours!.weeklySchedule[d] ?? const [])
+                    .isNotEmpty,
+              )
+              .toList();
           if (ordered.isNotEmpty) {
             final first = dayLabels[ordered.first]!;
             final last = dayLabels[ordered.last]!;
@@ -129,19 +176,32 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
             hours = '-';
           }
         } else if (parsedWorkingHours.selectedDays.isNotEmpty) {
-          final ordered = daysOrder.where((d) => parsedWorkingHours!.selectedDays.contains(d)).toList();
+          final ordered = daysOrder
+              .where((d) => parsedWorkingHours!.selectedDays.contains(d))
+              .toList();
           final first = dayLabels[ordered.first]!;
           final last = dayLabels[ordered.last]!;
           hours = ordered.length > 1 ? '$first - $last' : first;
         } else {
           hours = '-';
         }
-      }  
-      final max = station.inspactors ?? 0;  
+      }
+      final max = station.inspactors ?? 0;
       final current = 0;
       final inspectors = '$current/$max';
-      final active = station.stationActivationStatus == true ? 'Active' : 'Inactive';
-      return {'Station ID': idText, 'Station Name': station.stationName, 'Address': address, 'County': county, 'Hours': hours, 'Inspectors': inspectors, 'Status': active, '_model': station};
+      final active = station.stationActivationStatus == true
+          ? 'Active'
+          : 'Inactive';
+      return {
+        'Station ID': idText,
+        'Station Name': station.stationName,
+        'Address': address,
+        'County': county,
+        'Hours': hours,
+        'Inspectors': inspectors,
+        'Status': active,
+        '_model': station,
+      };
     }).toList();
 
     return DataTableWidget(
@@ -177,37 +237,59 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return InspactionStationViewPage(station: station, onDelete: () => _onDeleteInspactionStationTap(context, station));
+        return InspactionStationViewPage(
+          station: station,
+          onDelete: () => _onDeleteInspactionStationTap(context, station),
+        );
       },
     );
   }
 
   void _onAddInspactionStationTap(BuildContext context) async {
-    final result = await showDialog(context: context, builder: (context) => const AddInspactionStationPage());
+    print('=== MAIN PAGE DEBUG: Opening add station dialog ===');
+    final result = await showDialog(
+      context: context,
+      builder: (context) => const AddInspactionStationPage(),
+    );
+    print('=== MAIN PAGE DEBUG: Dialog result: $result ===');
+    print('=== MAIN PAGE DEBUG: Result type: ${result?.runtimeType} ===');
+
     if (result is InspactionStation) {
-      context.read<InspactionStationBloc>().add(AddInspactionStationEvent(station: result));
+      print('=== MAIN PAGE DEBUG: Adding station: ${result.stationName} ===');
+      context.read<InspactionStationBloc>().add(
+        AddInspactionStationEvent(station: result),
+      );
+    } else {
+      print('=== MAIN PAGE DEBUG: No station returned from dialog ===');
     }
   }
 
-  void _onEditInspactionStationTap(BuildContext context, InspactionStation station) async {
+  void _onEditInspactionStationTap(
+    BuildContext context,
+    InspactionStation station,
+  ) async {
     final result = await showDialog(
       context: context,
       builder: (context) => AddInspactionStationPage(station: station),
     );
     if (result is InspactionStation) {
       context.read<InspactionStationBloc>().add(
-        UpdateInspactionStationEvent(station: result, stationName: result.stationName, stationLowerName: result.stationName.toLowerCase(), inspactors: result.inspactors ?? 0),
+        UpdateInspactionStationEvent(station: result),
       );
     }
   }
 
-  void _onDeleteInspactionStationTap(BuildContext context, InspactionStation station) async {
+  void _onDeleteInspactionStationTap(
+    BuildContext context,
+    InspactionStation station,
+  ) async {
     final shouldDelete = await AppCustomDialog.show<bool>(
       context: context,
       icon: Icons.delete_outline,
       iconBackgroundColor: appColors.red,
       title: 'Delete Station',
-      message: 'Are you sure you want to delete "${station.stationName}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${station.stationName}"? This action cannot be undone.',
       primaryButtonText: 'Delete',
       secondaryButtonText: 'Cancel',
       primaryButtonColor: appColors.red,
@@ -215,8 +297,12 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
       onSecondaryPressed: () => Navigator.of(context).pop(false),
     );
 
-    if (shouldDelete == true && station.sId != null && station.sId!.isNotEmpty) {
-      context.read<InspactionStationBloc>().add(DeleteInspactionStationEvent(stationId: station.sId!));
+    if (shouldDelete == true &&
+        station.sId != null &&
+        station.sId!.isNotEmpty) {
+      context.read<InspactionStationBloc>().add(
+        DeleteInspactionStationEvent(stationId: station.sId!),
+      );
     }
   }
 }

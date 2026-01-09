@@ -20,9 +20,18 @@ void main() {
 }
 
 void initializeFirebase() async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseCrashlyticsService.initialize();
-  await LocalStorageService.instance.init();
+  try {
+    print('=== FIREBASE DEBUG: Initializing Firebase... ===');
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    print('=== FIREBASE DEBUG: Firebase initialized successfully ===');
+    await FirebaseCrashlyticsService.initialize();
+    await LocalStorageService.instance.init();
+    print('=== FIREBASE DEBUG: All services initialized ===');
+  } catch (e, stackTrace) {
+    print('=== FIREBASE DEBUG: Error initializing Firebase: $e ===');
+    print('=== FIREBASE DEBUG: Stack trace: $stackTrace ===');
+    rethrow;
+  }
 }
 
 class MyApp extends StatelessWidget {

@@ -102,8 +102,19 @@ class FirestoreService {
         required ToFirestore<T> toFirestore,
         required T data,
       }) async {
+    print('=== FIRESTORE DEBUG: Adding document to path: $path ===');
     final map = toFirestore(data);
-    return await _colRef(path).add(map);
+    print('=== FIRESTORE DEBUG: Document data: $map ===');
+    
+    try {
+      final result = await _colRef(path).add(map);
+      print('=== FIRESTORE DEBUG: Document added successfully, ID: ${result.id} ===');
+      return result;
+    } catch (e, stackTrace) {
+      print('=== FIRESTORE DEBUG: Error adding document: $e ===');
+      print('=== FIRESTORE DEBUG: Stack trace: $stackTrace ===');
+      rethrow;
+    }
   }
 
   /// Set document (create or replace) at given path

@@ -163,6 +163,10 @@ class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
   }
 
   void _onValidate(ValidateEvent event, Emitter<WorkingHoursState> emit) {
+    emit(state.copyWith(errors: validateHours()));
+  }
+
+  Map<String, String?> validateHours() {
     final errs = <String, String?>{};
     for (final day in daysOrder) {
       if (!state.selectedDays.contains(day)) continue;
@@ -176,7 +180,7 @@ class WorkingHoursBloc extends Bloc<WorkingHoursEvent, WorkingHoursState> {
         errs[day] = 'End time must be after start';
       }
     }
-    emit(state.copyWith(errors: errs));
+    return errs;
   }
 
   WorkingHours toWorkingHours() {

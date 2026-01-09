@@ -5,19 +5,46 @@ import '../../services/firebase_service/firestore_service.dart';
 
 class InspactionStationRepository {
   InspactionStationRepository._();
-  static final InspactionStationRepository instance = InspactionStationRepository._();
+  static final InspactionStationRepository instance =
+      InspactionStationRepository._();
 
   final _firestoreService = FirestoreService.instance;
   final String _collectionPath = 'inspection_stations';
 
   Future<DocumentReference> addStation(InspactionStation station) async {
-    final ref = await _firestoreService.addDocument<InspactionStation>(_collectionPath, toFirestore: (s) => s.toJson(), data: station);
-    await ref.update({'sId': ref.id});
-    return ref;
+    print('=== REPOSITORY DEBUG: Adding station to Firestore... ===');
+    print('=== REPOSITORY DEBUG: Station data: ${station.toJson()} ===');
+
+    try {
+      final ref = await _firestoreService.addDocument<InspactionStation>(
+        _collectionPath,
+        toFirestore: (s) => s.toJson(),
+        data: station,
+      );
+      print(
+        '=== REPOSITORY DEBUG: Station added successfully, ID: ${ref.id} ===',
+      );
+      await ref.update({'sId': ref.id});
+      print('=== REPOSITORY DEBUG: Updated station with sId field ===');
+      return ref;
+    } catch (e, stackTrace) {
+      print('=== REPOSITORY DEBUG: Error adding station: $e ===');
+      print('=== REPOSITORY DEBUG: Stack trace: $stackTrace ===');
+      rethrow;
+    }
   }
 
-  Future<void> setStation(String id, InspactionStation station, {bool merge = false}) async {
-    await _firestoreService.setDocument<InspactionStation>('$_collectionPath/$id', toFirestore: (s) => s.toJson(), data: station, merge: merge);
+  Future<void> setStation(
+    String id,
+    InspactionStation station, {
+    bool merge = false,
+  }) async {
+    await _firestoreService.setDocument<InspactionStation>(
+      '$_collectionPath/$id',
+      toFirestore: (s) => s.toJson(),
+      data: station,
+      merge: merge,
+    );
   }
 
   Future<List<InspactionStation>> getAllStations() async {
@@ -28,12 +55,26 @@ class InspactionStationRepository {
         map['sId'] = docId;
         return InspactionStation.fromJson(map);
       },
-      queryBuilder: (collection) => collection.orderBy('create_time', descending: false),
+      queryBuilder: (collection) =>
+          collection.orderBy('create_time', descending: false),
     );
     return items;
   }
 
   Future<void> deleteStation(String id) async {
     await _firestoreService.deleteDocument('$_collectionPath/$id');
+  }
+
+  /// Checks if a phone number is already registered.
+  /// Returns true if duplicate exists.
+  Future<bool> isPhoneRegistered(String phone) async {
+    final result = await _firestoreService.getCollectionOnce<InspactionStation>(
+      _collectionPath,
+      fromFirestore: (data, id) =>
+          InspactionStation.fromJson({...data, 'sId': id}),
+      queryBuilder: (query) =>
+          query.where('station_contact_number', isEqualTo: phone).limit(1),
+    );
+    return result.isNotEmpty;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inspection_station/components/app_text_style/app_text_style.dart';
 
 import '../../utils/constants/app_dimension.dart';
 import '../../utils/constants/app_colors.dart';
@@ -56,7 +57,9 @@ class AppButton extends StatelessWidget {
     return isButtonLoading == true
         ? const LoaderView()
         : Bounce(
-            duration: Duration(milliseconds: isDisable == null || isDisable == false ? 110 : 0),
+            duration: Duration(
+              milliseconds: isDisable == null || isDisable == false ? 110 : 0,
+            ),
             onPressed: () {
               if (isDisable == null || isDisable == false) {
                 if (onTap != null) {
@@ -70,9 +73,29 @@ class AppButton extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: s.s8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(radius ?? s.s10),
-                color: isDisable == null || isDisable == false ? (backgroundColor ?? appColors.primaryColor) : Colors.grey,
-                border: isBorderEnable != null ? (isBorderEnable! ? Border.all(color: borderColor == null ? appColors.primaryColor : borderColor!, width: 1) : null) : null,
-                boxShadow: isShadow == null || isShadow == true ? [BoxShadow(color: Colors.grey.withAlpha(50), blurRadius: 2.0, spreadRadius: 2, offset: const Offset(0, 2))] : null,
+                color: isDisable == null || isDisable == false
+                    ? (backgroundColor ?? appColors.primaryColor)
+                    : Colors.grey,
+                border: isBorderEnable != null
+                    ? (isBorderEnable!
+                          ? Border.all(
+                              color: borderColor == null
+                                  ? appColors.primaryColor
+                                  : borderColor!,
+                              width: 1,
+                            )
+                          : null)
+                    : null,
+                boxShadow: isShadow == null || isShadow == true
+                    ? [
+                        BoxShadow(
+                          color: Colors.grey.withAlpha(50),
+                          blurRadius: 2.0,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
               ),
               height: height ?? s.s40,
               width: width ?? context.width(),
@@ -87,11 +110,10 @@ class AppButton extends StatelessWidget {
                               // ignore: deprecated_member_use
                               textScaleFactor: 1.0,
                               textAlign: textAlign ?? TextAlign.center,
-                              style: GoogleFonts.ptSans(
-                                decoration: TextDecoration.none,
-                                fontWeight: fontWeight ?? FontWeight.w500,
-                                fontSize: fontSize ?? FontSize.s16,
-                                color: fontColor == null ? appColors.white : fontColor!,
+                              style: primaryTextStyle(
+                                color: fontColor == null
+                                    ? appColors.primaryTextColor
+                                    : fontColor!,
                               ),
                             ),
                 ),

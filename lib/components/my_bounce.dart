@@ -60,9 +60,12 @@ class BounceState extends State<Bounce> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     _scale = 1 - _animate.value;
-    return GestureDetector(
+    return InkWell(
       onTap: _onTap,
-      behavior: HitTestBehavior.opaque,
+      focusColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       child: Transform.scale(scale: _scale, child: widget.child),
     );
   }
