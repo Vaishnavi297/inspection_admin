@@ -87,17 +87,27 @@ class InspactionStation {
       stationAddress: json['station_address'],
       stationZipCode: json['station_zip_code'],
 
-      sCountyDetails: json['s_county_details'] != null ? County.fromJson(json['s_county_details']!) : null,
-      stationDocumentIdList: (json['station_document_id_list'] as List?)?.toList(),
+      sCountyDetails: json['s_county_details'] != null
+          ? County.fromJson(json['s_county_details']!)
+          : null,
+      stationDocumentIdList: (json['station_document_id_list'] as List?)
+          ?.toList(),
 
-      stationLatitude: json['station_latitude'] != null ? (json['station_latitude'] as num).toDouble() : null,
-      stationLongitude: json['station_longitude'] != null ? (json['station_longitude'] as num).toDouble() : null,
+      stationLatitude: json['station_latitude'] != null
+          ? (json['station_latitude'] as num).toDouble()
+          : null,
+      stationLongitude: json['station_longitude'] != null
+          ? (json['station_longitude'] as num).toDouble()
+          : null,
 
       stationRegApprovalStatus: json['station_reg_approval_status'],
       stationAvailabilityStatus: json['station_availability_status'],
-      stationDocumentsVerificationStatus: json['station_documents_verification_status'],
+      stationDocumentsVerificationStatus:
+          json['station_documents_verification_status'],
       stationActivationStatus: json['station_activation_status'],
-      inspactors: json['inspactors'] != null ? (json['inspactors'] as num).toInt() : null,
+      inspactors: json['inspactors'] != null
+          ? (json['inspactors'] as num).toInt()
+          : 0,
 
       // startTime:
       // json['start_time'] != null
@@ -107,8 +117,12 @@ class InspactionStation {
       // json['end_time'] != null
       //     ? json['end_time']
       //     : null,
-      createTime: json['create_time'] != null ? (json['create_time'] as Timestamp) : null,
-      updateTime: json['update_time'] != null ? (json['update_time'] as Timestamp) : null,
+      createTime: json['create_time'] != null
+          ? (json['create_time'] as Timestamp)
+          : null,
+      updateTime: json['update_time'] != null
+          ? (json['update_time'] as Timestamp)
+          : null,
       stationDescription: json['station_description'],
       workingHours: wh,
     );
@@ -129,13 +143,16 @@ class InspactionStation {
       // 'station_tel_no': stationTelNo,
       'station_address': stationAddress,
       'station_zip_code': stationZipCode,
-      's_county_details': sCountyDetails != null ? sCountyDetails!.toJson() : null,
+      's_county_details': sCountyDetails != null
+          ? sCountyDetails!.toJson()
+          : null,
       'station_document_id_list': stationDocumentIdList,
       'station_latitude': stationLatitude,
       'station_longitude': stationLongitude,
       'station_reg_approval_status': stationRegApprovalStatus,
       'station_availability_status': stationAvailabilityStatus,
-      'station_documents_verification_status': stationDocumentsVerificationStatus,
+      'station_documents_verification_status':
+          stationDocumentsVerificationStatus,
       'station_activation_status': stationActivationStatus,
       'inspactors': inspactors,
       // 'start_time': startTime,
@@ -190,13 +207,19 @@ class InspactionStation {
       stationAddress: stationAddress ?? this.stationAddress,
       stationZipCode: stationZipCode ?? this.stationZipCode,
       sCountyDetails: sCountyDetails ?? this.sCountyDetails,
-      stationDocumentIdList: stationDocumentIdList ?? this.stationDocumentIdList,
+      stationDocumentIdList:
+          stationDocumentIdList ?? this.stationDocumentIdList,
       stationLatitude: stationLatitude ?? this.stationLatitude,
       stationLongitude: stationLongitude ?? this.stationLongitude,
-      stationRegApprovalStatus: stationRegApprovalStatus ?? this.stationRegApprovalStatus,
-      stationAvailabilityStatus: stationAvailabilityStatus ?? this.stationAvailabilityStatus,
-      stationDocumentsVerificationStatus: stationDocumentsVerificationStatus ?? this.stationDocumentsVerificationStatus,
-      stationActivationStatus: stationActivationStatus ?? this.stationActivationStatus,
+      stationRegApprovalStatus:
+          stationRegApprovalStatus ?? this.stationRegApprovalStatus,
+      stationAvailabilityStatus:
+          stationAvailabilityStatus ?? this.stationAvailabilityStatus,
+      stationDocumentsVerificationStatus:
+          stationDocumentsVerificationStatus ??
+          this.stationDocumentsVerificationStatus,
+      stationActivationStatus:
+          stationActivationStatus ?? this.stationActivationStatus,
       inspactors: inspactors ?? this.inspactors,
       // startTime: startTime ?? this.startTime,
       // endTime: endTime ?? this.endTime,
@@ -214,7 +237,12 @@ class WorkingHours {
   final Map<String, String> endTimes;
   final Map<String, List<DayInterval>> weeklySchedule;
 
-  const WorkingHours({required this.selectedDays, required this.startTimes, required this.endTimes, this.weeklySchedule = const {}});
+  const WorkingHours({
+    required this.selectedDays,
+    required this.startTimes,
+    required this.endTimes,
+    this.weeklySchedule = const {},
+  });
 
   Map<String, dynamic> toJson() {
     if (weeklySchedule.isNotEmpty) {
@@ -242,13 +270,17 @@ class WorkingHours {
 
   factory WorkingHours.fromJson(Map<String, dynamic> json) {
     if (json.containsKey('weeklySchedule')) {
-      final wsRaw = Map<String, dynamic>.from(json['weeklySchedule'] ?? const {});
+      final wsRaw = Map<String, dynamic>.from(
+        json['weeklySchedule'] ?? const {},
+      );
       final ws = <String, List<DayInterval>>{};
       final selected = <String>{};
       final starts = <String, String>{};
       final ends = <String, String>{};
       wsRaw.forEach((day, list) {
-        final ranges = (list as List? ?? const <dynamic>[]).map((e) => DayInterval.fromJson(Map<String, dynamic>.from(e))).toList();
+        final ranges = (list as List? ?? const <dynamic>[])
+            .map((e) => DayInterval.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
         ws[day] = ranges;
         if (ranges.isNotEmpty) {
           selected.add(day);
@@ -256,7 +288,12 @@ class WorkingHours {
           ends[day] = ranges.first.close;
         }
       });
-      return WorkingHours(selectedDays: selected, startTimes: starts, endTimes: ends, weeklySchedule: ws);
+      return WorkingHours(
+        selectedDays: selected,
+        startTimes: starts,
+        endTimes: ends,
+        weeklySchedule: ws,
+      );
     } else if (json.containsKey('selected_days')) {
       final selected = Set<String>.from(json['selected_days'] ?? const []);
       final starts = Map<String, String>.from(json['start_times'] ?? const {});
@@ -269,7 +306,12 @@ class WorkingHours {
           ws[d] = [DayInterval(open: s, close: e)];
         }
       }
-      return WorkingHours(selectedDays: selected, startTimes: starts, endTimes: ends, weeklySchedule: ws);
+      return WorkingHours(
+        selectedDays: selected,
+        startTimes: starts,
+        endTimes: ends,
+        weeklySchedule: ws,
+      );
     } else {
       final selected = <String>{};
       final starts = <String, String>{};
@@ -292,7 +334,12 @@ class WorkingHours {
           }
         }
       }
-      return WorkingHours(selectedDays: selected, startTimes: starts, endTimes: ends, weeklySchedule: ws);
+      return WorkingHours(
+        selectedDays: selected,
+        startTimes: starts,
+        endTimes: ends,
+        weeklySchedule: ws,
+      );
     }
   }
 }
@@ -306,6 +353,9 @@ class DayInterval {
   }
 
   factory DayInterval.fromJson(Map<String, dynamic> json) {
-    return DayInterval(open: json['open']?.toString() ?? '', close: json['close']?.toString() ?? '');
+    return DayInterval(
+      open: json['open']?.toString() ?? '',
+      close: json['close']?.toString() ?? '',
+    );
   }
 }

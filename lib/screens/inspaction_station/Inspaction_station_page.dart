@@ -187,8 +187,8 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
         }
       }
       final max = station.inspactors ?? 0;
-      final current = 0;
-      final inspectors = '$current/$max';
+      // final current = 0;
+      final inspectors = '$max';
       final active = station.stationActivationStatus == true
           ? 'Active'
           : 'Inactive';

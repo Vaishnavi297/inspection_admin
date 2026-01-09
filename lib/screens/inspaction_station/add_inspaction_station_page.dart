@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -203,7 +201,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
                               prefix: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  stationCountry ?? '',
+                                  stationCountry,
                                   style: primaryTextStyle(),
                                 ),
                               ),
@@ -792,6 +790,23 @@ class _TimeInputField extends StatelessWidget {
         final picked = await showTimePicker(
           context: context,
           initialTime: initial,
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                timePickerTheme: TimePickerThemeData(
+                  cancelButtonStyle: ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(appColors.white),
+                    backgroundColor: WidgetStatePropertyAll(appColors.black),
+                  ),
+                  confirmButtonStyle: ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(appColors.white),
+                    backgroundColor: WidgetStatePropertyAll(appColors.black),
+                  ),
+                ),
+              ),
+              child: child!,
+            );
+          },
         );
         if (picked != null) {
           final hh = picked.hour.toString().padLeft(2, '0');
