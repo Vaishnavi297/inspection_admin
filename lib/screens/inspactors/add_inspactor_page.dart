@@ -28,11 +28,21 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController(text: widget.initialData?['firstName'] ?? '');
-    _lastNameController = TextEditingController(text: widget.initialData?['lastName'] ?? '');
-    _emailController = TextEditingController(text: widget.initialData?['email'] ?? '');
-    _phoneController = TextEditingController(text: widget.initialData?['phone'] ?? '');
-    _badgeController = TextEditingController(text: widget.initialData?['badgeId'] ?? _generateBadgeId());
+    _firstNameController = TextEditingController(
+      text: widget.initialData?['firstName'] ?? '',
+    );
+    _lastNameController = TextEditingController(
+      text: widget.initialData?['lastName'] ?? '',
+    );
+    _emailController = TextEditingController(
+      text: widget.initialData?['email'] ?? '',
+    );
+    _phoneController = TextEditingController(
+      text: widget.initialData?['phone'] ?? '',
+    );
+    _badgeController = TextEditingController(
+      text: widget.initialData?['badgeId'] ?? _generateBadgeId(),
+    );
   }
 
   @override
@@ -49,7 +59,8 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     final rand = Random();
     final numPart = (300 + rand.nextInt(400)).toString();
-    final suffix = '${chars[rand.nextInt(chars.length)]}${chars[rand.nextInt(chars.length)]}';
+    final suffix =
+        '${chars[rand.nextInt(chars.length)]}${chars[rand.nextInt(chars.length)]}';
     return 'WV-$numPart-$suffix';
   }
 
@@ -64,7 +75,11 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
       actionsOverflowButtonSpacing: s.s12,
       title: Text(
         widget.initialData == null ? 'Add New Inspector' : 'Update Inspector',
-        style: boldTextStyle(size: 18, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
+        style: boldTextStyle(
+          size: 18,
+          fontWeight: FontWeight.w600,
+          color: appColors.primaryTextColor,
+        ),
       ),
       content: Form(
         key: _formKey,
@@ -85,42 +100,98 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
                           controller: _firstNameController,
                           labelText: 'First Name *',
                           hintText: 'Enter first name',
-                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
                         ),
                       ),
                       SizedBox(width: s.s12),
                       Expanded(
-                        child: textField(controller: _lastNameController, labelText: 'Last Name *', hintText: 'Enter last name', validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: s.s12),
-                  textField(controller: _emailController, labelText: 'Email Address *', hintText: 'inspector@inspectionwv.gov', validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null),
-                  SizedBox(height: s.s12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: textField(controller: _phoneController, labelText: 'Phone Number *', hintText: '(304) 555-0123', validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null),
-                      ),
-                      SizedBox(width: s.s12),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedStation?.sId,
-                          items: stations.map((s) => DropdownMenuItem(value: s.sId, child: Text(s.stationName))).toList(),
-                          onChanged: (id) => setState(() => _selectedStation = stations.firstWhere((x) => x.sId == id)),
-                          decoration: InputDecoration(
-                            labelText: 'Station *',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
+                        child: textField(
+                          controller: _lastNameController,
+                          labelText: 'Last Name *',
+                          hintText: 'Enter last name',
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: s.s12),
+                  textField(
+                    controller: _emailController,
+                    labelText: 'Email Address *',
+                    hintText: 'inspector@inspectionwv.gov',
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  ),
+                  SizedBox(height: s.s12),
                   Row(
                     children: [
                       Expanded(
-                        child: textField(controller: _badgeController, labelText: 'Badge ID', hintText: 'WV-512-JB'),
+                        child: textField(
+                          controller: _phoneController,
+                          labelText: 'Phone Number *',
+                          hintText: '(304) 555-0123',
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
+                        ),
+                      ),
+                      SizedBox(width: s.s12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 20, bottom: 8),
+                              child: Text(
+                                'Station *',
+                                style: primaryTextStyle(
+                                  color: appColors.textSecondaryColor,
+                                ),
+                              ),
+                            ),
+                            DropdownButtonFormField(
+                              initialValue: _selectedStation?.sId,
+                              isDense: true,
+                              focusColor: appColors.primaryColor,
+                              decoration: defaultInputDecoration(),
+                              items: stations
+                                  .map(
+                                    (s) => DropdownMenuItem(
+                                      value: s.sId,
+                                      child: Text(s.stationName),
+                                    ),
+                                  )
+                                  .toList(),
+
+                              onChanged: (id) => setState(
+                                () => _selectedStation = stations.firstWhere(
+                                  (x) => x.sId == id,
+                                ),
+                              ),
+
+                              icon: Icon(
+                                Icons.expand_more,
+                                color: appColors.textSecondaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: s.s12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: textField(
+                          controller: _badgeController,
+                          labelText: 'Badge ID',
+                          hintText: 'WV-512-JB',
+                        ),
                       ),
                     ],
                   ),
@@ -152,15 +223,26 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
           backgroundColor: appColors.transparent,
           isBorderEnable: true,
           onTap: () => Navigator.of(context).pop(),
-          btnWidget: Text('Cancel', style: primaryTextStyle(color: appColors.secondaryTextColor)),
+          btnWidget: Text(
+            'Cancel',
+            style: primaryTextStyle(color: appColors.secondaryTextColor),
+          ),
         ),
-        AppButton(height: 40, width: 180, strTitle: widget.initialData == null ? 'Create Inspector' : 'Update Inspector', onTap: _onSave),
+        AppButton(
+          height: 40,
+          width: 180,
+          strTitle: widget.initialData == null
+              ? 'Create Inspector'
+              : 'Update Inspector',
+          onTap: _onSave,
+        ),
       ],
     );
   }
 
   void _onSave() {
-    if (_formKey.currentState?.validate() != true || _selectedStation == null) return;
+    if (_formKey.currentState?.validate() != true || _selectedStation == null)
+      return;
     Navigator.of(context).pop({
       'firstName': _firstNameController.text.trim(),
       'lastName': _lastNameController.text.trim(),

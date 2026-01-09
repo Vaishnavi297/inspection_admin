@@ -13,35 +13,58 @@ class DashboardRepository {
     // 1. Fetch all counts in parallel using Future.wait
     try {
       final now = DateTime.now();
-      final startOfDay = Timestamp.fromDate(DateTime(now.year, now.month, now.day));
+      final startOfDay = Timestamp.fromDate(
+        DateTime(now.year, now.month, now.day),
+      );
 
       final results = await Future.wait([
         // Stations [0, 1]
         _firestore.getDocumentCount('inspection_stations'),
-        _firestore.getDocumentCount('inspection_stations', queryBuilder: (q) => q.where('station_activation_status', isEqualTo: true)),
+        _firestore.getDocumentCount(
+          'inspection_stations',
+          queryBuilder: (q) =>
+              q.where('station_activation_status', isEqualTo: true),
+        ),
 
         // Inspectors [2]
         _firestore.getDocumentCount('inspectors'),
 
         // Inspections (Today) [3, 4, 5]
-        _firestore.getDocumentCount('inspections', queryBuilder: (q) => q.where('create_time', isGreaterThanOrEqualTo: startOfDay)),
         _firestore.getDocumentCount(
           'inspections',
-          queryBuilder: (q) => q.where('create_time', isGreaterThanOrEqualTo: startOfDay).where('status', isEqualTo: 'pass'),
+          queryBuilder: (q) =>
+              q.where('create_time', isGreaterThanOrEqualTo: startOfDay),
         ),
         _firestore.getDocumentCount(
           'inspections',
-          queryBuilder: (q) => q.where('create_time', isGreaterThanOrEqualTo: startOfDay).where('status', isEqualTo: 'fail'),
+          queryBuilder: (q) => q
+              .where('create_time', isGreaterThanOrEqualTo: startOfDay)
+              .where('status', isEqualTo: 'pass'),
+        ),
+        _firestore.getDocumentCount(
+          'inspections',
+          queryBuilder: (q) => q
+              .where('create_time', isGreaterThanOrEqualTo: startOfDay)
+              .where('status', isEqualTo: 'fail'),
         ),
 
         // Appointments [6, 7, 8]
         _firestore.getDocumentCount('appointments'),
-        _firestore.getDocumentCount('appointments', queryBuilder: (q) => q.where('status', isEqualTo: 'scheduled')),
-        _firestore.getDocumentCount('appointments', queryBuilder: (q) => q.where('status', isEqualTo: 'completed')),
+        _firestore.getDocumentCount(
+          'appointments',
+          queryBuilder: (q) => q.where('status', isEqualTo: 'scheduled'),
+        ),
+        _firestore.getDocumentCount(
+          'appointments',
+          queryBuilder: (q) => q.where('status', isEqualTo: 'completed'),
+        ),
 
         // Vehicles [9, 10]
         _firestore.getDocumentCount('vehicles'),
-        _firestore.getDocumentCount('vehicles', queryBuilder: (q) => q.where('status', isEqualTo: 'active')),
+        _firestore.getDocumentCount(
+          'vehicles',
+          queryBuilder: (q) => q.where('status', isEqualTo: 'active'),
+        ),
 
         // Users [11]
         _firestore.getDocumentCount('users'),
@@ -71,9 +94,11 @@ class DashboardRepository {
     try {
       return await _firestore.getCollectionOnce<DashboardActivity>(
         'inspections',
-        queryBuilder: (q) => q.orderBy('create_time', descending: true).limit(5),
+        queryBuilder: (q) =>
+            q.orderBy('create_time', descending: true).limit(5),
         fromFirestore: (data, id) {
-          final createdAt = (data['create_time'] as Timestamp?)?.toDate() ?? DateTime.now();
+          final createdAt =
+              (data['create_time'] as Timestamp?)?.toDate() ?? DateTime.now();
           final time = DateFormat('hh:mm a').format(createdAt);
           return DashboardActivity(
             title: data['vehicle_info'] ?? 'Unknown Vehicle',
@@ -99,8 +124,10 @@ class DashboardRepository {
         fromFirestore: (data, id) {
           return DashboardTopStation(
             name: data['station_name'] ?? 'Unknown',
-            meta: '${data['s_county_details']['county_name'] ?? 'Unknown County'} • ${(data['max_inspectors'] ?? 0)} Inspectors',
-            value: '${(data['total_inspections'] ?? 0)}', // Assuming a counter exists, else 0
+            meta:
+                '${data['s_county_details']['county_name'] ?? 'Unknown County'} • ${(data['inspactors'] ?? 0)} Inspectors',
+            value:
+                '${(data['total_inspections'] ?? 0)}', // Assuming a counter exists, else 0
           );
         },
       );
