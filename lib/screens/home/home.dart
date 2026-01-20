@@ -14,6 +14,8 @@ import '../county/county_page.dart';
 import '../county/bloc/county_bloc.dart';
 import '../vehicles/vehicles_page.dart';
 import '../vehicles/bloc/vehicles_bloc.dart';
+import '../inspection/inspection_page.dart';
+import '../inspection/bloc/inspection_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,15 +32,35 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return const DashboardPage();
       case 1:
-        return BlocProvider(create: (context) => CountyBloc(), child: const CountyPage());
+        return BlocProvider(
+          create: (context) => CountyBloc(),
+          child: const CountyPage(),
+        );
       case 2:
-        return BlocProvider(create: (context) => InspactionStationBloc(), child: const InspactionStationPage());
+        return BlocProvider(
+          create: (context) => InspactionStationBloc(),
+          child: const InspactionStationPage(),
+        );
       case 3:
-        return BlocProvider(create: (context) => InspactorBloc(), child: const InspactorsPage());
+        return BlocProvider(
+          create: (context) => InspactorBloc(),
+          child: const InspactorsPage(),
+        );
       case 4:
-        return BlocProvider(create: (context) => UsersBloc(), child: const UsersPage());
+        return BlocProvider(
+          create: (context) => UsersBloc(),
+          child: const UsersPage(),
+        );
       case 5:
-        return BlocProvider(create: (context) => VehiclesBloc(), child: const VehiclesPage());
+        return BlocProvider(
+          create: (context) => VehiclesBloc(),
+          child: const VehiclesPage(),
+        );
+      case 6:
+        return BlocProvider(
+          create: (context) => InspectionBloc(),
+          child: const InspectionPage(),
+        );
       // case 6:
       //   return _SectionPlaceholder(title: 'Settings');
       default:
@@ -46,12 +68,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+
+  
+
   @override
   Widget build(BuildContext context) {
     final isSmall = ResponsiveWidget.isSmallScreen(context);
     return Scaffold(
       backgroundColor: appColors.backgroundColor,
-      appBar: isSmall ? AppBar(title: const Text('Inspection WV Admin'), backgroundColor: appColors.backgroundColor, elevation: 0) : null,
+      appBar: isSmall
+          ? AppBar(
+              title: const Text('Inspection WV Admin'),
+              backgroundColor: appColors.backgroundColor,
+              elevation: 0,
+            )
+          : null,
       drawer: isSmall
           ? Drawer(
               child: SidebarComponent(
@@ -65,7 +96,11 @@ class _HomePageState extends State<HomePage> {
           : null,
       body: Row(
         children: [
-          if (!isSmall) SidebarComponent(currentIndex: _currentIndex, onSelect: (i) => setState(() => _currentIndex = i)),
+          if (!isSmall)
+            SidebarComponent(
+              currentIndex: _currentIndex,
+              onSelect: (i) => setState(() => _currentIndex = i),
+            ),
           Expanded(child: _contentFor(_currentIndex)),
         ],
       ),

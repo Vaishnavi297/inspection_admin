@@ -59,7 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
         color: appColors.green,
       ),
       _StatData(
-        title: 'Total Appointments',
+        title: 'Total Inspections',
         value: stats.totalAppointments.toString(),
         chips: ['${stats.scheduledAppointments} Scheduled', '${stats.completedAppointments} Completed'],
         icon: Icons.calendar_today_outlined,
@@ -68,7 +68,7 @@ class _DashboardPageState extends State<DashboardPage> {
       _StatData(
         title: 'Registered Vehicles',
         value: stats.totalVehicles.toString(),
-        chips: ['${stats.activeStickers} Active Stickers', '${stats.totalUsers} Users'],
+        chips: ["", '${stats.totalUsers} Users'],
         icon: Icons.directions_car_outlined,
         color: appColors.orange,
       ),
@@ -99,6 +99,7 @@ class _DashboardPageState extends State<DashboardPage> {
           },
           builder: (context, state) {
             if (state is DashboardLoading) {
+              
               return const Center(child: LoaderView());
             } else if (state is DashboardLoaded) {
               final stats = _mapToStatData(state.stats);

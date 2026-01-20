@@ -15,7 +15,11 @@ import '../../../utils/routes/app_routes.dart';
 class SidebarComponent extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int>? onSelect;
-  const SidebarComponent({super.key, required this.currentIndex, this.onSelect});
+  const SidebarComponent({
+    super.key,
+    required this.currentIndex,
+    this.onSelect,
+  });
 
   @override
   State<SidebarComponent> createState() => _SidebarComponentState();
@@ -39,17 +43,40 @@ class _SidebarComponentState extends State<SidebarComponent> {
                 width: ResponsiveWidget.isMediumScreen(context) ? 48 : 40,
                 height: ResponsiveWidget.isMediumScreen(context) ? 48 : 40,
                 child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   elevation: 4,
-                  child: CircleAvatar(radius: 20, backgroundImage: AssetImage(AppAssets.imgAppLogo)),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: AssetImage(AppAssets.imgAppLogo),
+                  ),
                 ),
               ),
               minLeadingWidth: 0,
               horizontalTitleGap: 12,
-              contentPadding: ResponsiveWidget.isMediumScreen(context) ? EdgeInsets.zero : EdgeInsets.only(left: 8, right: 16),
-              title: ResponsiveWidget.isMediumScreen(context) ? null : Text(appStrings.lblAppName, style: boldTextStyle(size: 20, color: appColors.primaryColor)),
-              subtitle: ResponsiveWidget.isMediumScreen(context) ? null : Text(AdminRepository.instance.adminData?.email ?? appStrings.lblEmail, style: secondaryTextStyle(size: 12)),
-              trailing: ResponsiveWidget.isMediumScreen(context) ? null : ImageIcon(AssetImage(AppAssets.imgCloseDrawer), size: 24),
+              contentPadding: ResponsiveWidget.isMediumScreen(context)
+                  ? EdgeInsets.zero
+                  : EdgeInsets.only(left: 8, right: 16),
+              title: ResponsiveWidget.isMediumScreen(context)
+                  ? null
+                  : Text(
+                      appStrings.lblAppName,
+                      style: boldTextStyle(
+                        size: 20,
+                        color: appColors.primaryColor,
+                      ),
+                    ),
+              subtitle: ResponsiveWidget.isMediumScreen(context)
+                  ? null
+                  : Text(
+                      AdminRepository.instance.adminData?.email ??
+                          appStrings.lblEmail,
+                      style: secondaryTextStyle(size: 12),
+                    ),
+              trailing: ResponsiveWidget.isMediumScreen(context)
+                  ? null
+                  : ImageIcon(AssetImage(AppAssets.imgCloseDrawer), size: 24),
               onTap: null,
             ),
             const Divider(height: 24, thickness: 0.5),
@@ -57,18 +84,53 @@ class _SidebarComponentState extends State<SidebarComponent> {
             Expanded(
               child: ListView(
                 children: [
-                  navItemWidget(title: 'Dashboard', icon: Icons.space_dashboard, index: 0, isTrailingIcon: false),
-                  navItemWidget(title: 'County', icon: Icons.map_outlined, index: 1),
-                  navItemWidget(title: 'Stations', icon: Icons.home_work_outlined, index: 2),
-                  navItemWidget(title: 'Inspactors', icon: Icons.badge_outlined, index: 3),
-                  navItemWidget(title: 'Users', icon: Icons.people_outline, index: 4),
-                  navItemWidget(title: 'Vehicles', icon: Icons.directions_car_outlined, index: 5),
-
+                  navItemWidget(
+                    title: 'Dashboard',
+                    icon: Icons.space_dashboard,
+                    index: 0,
+                    isTrailingIcon: false,
+                  ),
+                  navItemWidget(
+                    title: 'County',
+                    icon: Icons.map_outlined,
+                    index: 1,
+                  ),
+                  navItemWidget(
+                    title: 'Stations',
+                    icon: Icons.home_work_outlined,
+                    index: 2,
+                  ),
+                  navItemWidget(
+                    title: 'Inspactors',
+                    icon: Icons.badge_outlined,
+                    index: 3,
+                  ),
+                  navItemWidget(
+                    title: 'Users',
+                    icon: Icons.people_outline,
+                    index: 4,
+                  ),
+                  navItemWidget(
+                    title: 'Vehicles',
+                    icon: Icons.directions_car_outlined,
+                    index: 5,
+                  ),
+                  navItemWidget(
+                    title: 'Inspections',
+                    icon: Icons.fact_check_outlined,
+                    index: 6,
+                  ),
                 ],
               ),
             ),
 
-            navItemWidget(title: 'Logout', icon: Icons.logout, index: 7, isTrailingIcon: false, color: appColors.errorColor),
+            navItemWidget(
+              title: 'Logout',
+              icon: Icons.logout,
+              index: 7,
+              isTrailingIcon: false,
+              color: appColors.errorColor,
+            ),
 
             const Divider(height: 18, thickness: 0.5),
 
@@ -78,11 +140,27 @@ class _SidebarComponentState extends State<SidebarComponent> {
               leading: CircleAvatar(
                 radius: 18,
                 backgroundColor: appColors.primaryColor,
-                child: Icon(Icons.person_outline, size: 20, color: Colors.white),
+                child: Icon(
+                  Icons.person_outline,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
 
-              title: ResponsiveWidget.isMediumScreen(context) ? null : Text(AdminRepository.instance.adminData?.name ?? appStrings.lblUserName, style: boldTextStyle(size: 14)),
-              subtitle: ResponsiveWidget.isMediumScreen(context) ? null : Text(AdminRepository.instance.adminData?.role ?? appStrings.lblEmail, style: secondaryTextStyle(size: 12)),
+              title: ResponsiveWidget.isMediumScreen(context)
+                  ? null
+                  : Text(
+                      AdminRepository.instance.adminData?.name ??
+                          appStrings.lblUserName,
+                      style: boldTextStyle(size: 14),
+                    ),
+              subtitle: ResponsiveWidget.isMediumScreen(context)
+                  ? null
+                  : Text(
+                      AdminRepository.instance.adminData?.role ??
+                          appStrings.lblEmail,
+                      style: secondaryTextStyle(size: 12),
+                    ),
             ),
           ],
         ),
@@ -90,15 +168,27 @@ class _SidebarComponentState extends State<SidebarComponent> {
     );
   }
 
-  Widget navItemWidget({required String title, required IconData icon, required int index, bool? isTrailingIcon = true, Widget? trailing, Color? color}) {
+  Widget navItemWidget({
+    required String title,
+    required IconData icon,
+    required int index,
+    bool? isTrailingIcon = true,
+    Widget? trailing,
+    Color? color,
+  }) {
     final selected = widget.currentIndex == index;
     final bg = selected ? appColors.primaryColor : Colors.transparent;
-    final iconColor = color ?? (selected ? appColors.white : appColors.textSecondaryColor);
-    final textColor = color ?? (selected ? appColors.white : appColors.textPrimaryColor);
+    final iconColor =
+        color ?? (selected ? appColors.white : appColors.textSecondaryColor);
+    final textColor =
+        color ?? (selected ? appColors.white : appColors.textPrimaryColor);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(appConstants.defaultRadius)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(appConstants.defaultRadius),
+      ),
       child: ListTile(
         dense: true,
         leading: SizedBox(
@@ -111,22 +201,35 @@ class _SidebarComponentState extends State<SidebarComponent> {
             ? null
             : Text(
                 title,
-                style: primaryTextStyle(color: textColor, fontWeight: FontWeight.w500),
+                style: primaryTextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
         trailing: ResponsiveWidget.isMediumScreen(context)
             ? null
             : isTrailingIcon == true
-            ? trailing ?? Icon(Icons.arrow_forward_ios_rounded, color: color, size: s.s18)
+            ? trailing ??
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: color,
+                    size: s.s18,
+                  )
             : null,
         onTap: index == 7
             ? () async {
-                final shouldLogout = await LogoutConfirmationDialog.show(context: context);
+                final shouldLogout = await LogoutConfirmationDialog.show(
+                  context: context,
+                );
 
                 if (shouldLogout == true) {
                   await LocalStorageService.instance.clearAllLocal();
                   await LocalStorageService.instance.clearAllSecure();
                   if (context.mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.login,
+                      (route) => false,
+                    );
                   }
                 }
               }

@@ -38,7 +38,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
   bool _active = true;
   bool _isLoading = false;
 
-  String stationCountry = "+91";
+  String stationCountry = "+1";
 
   @override
   void initState() {
