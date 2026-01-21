@@ -34,7 +34,11 @@ class AdminRepository {
     final data = admin.toJson();
     // data.remove('id');
 
-    final ref = await _firestoreService.addDocument<Map<String, dynamic>>(_collectionPath, toFirestore: (m) => m, data: data);
+    final ref = await _firestoreService.addDocument<Map<String, dynamic>>(
+      _collectionPath,
+      toFirestore: (m) => m,
+      data: data,
+    );
 
     // Update a_id in Firestore
     // await ref.update({'id': ref.id});
@@ -42,9 +46,18 @@ class AdminRepository {
     return ref;
   }
 
-  Future<void> setAdmin(String id, AdminModel admin, {bool merge = false}) async {
+  Future<void> setAdmin(
+    String id,
+    AdminModel admin, {
+    bool merge = false,
+  }) async {
     final data = admin.toJson();
-    await _firestoreService.setDocument<Map<String, dynamic>>('$_collectionPath/$id', toFirestore: (m) => m, data: data, merge: merge);
+    await _firestoreService.setDocument<Map<String, dynamic>>(
+      '$_collectionPath/$id',
+      toFirestore: (m) => m,
+      data: data,
+      merge: merge,
+    );
   }
 
   // -------------------- Read --------------------
@@ -69,7 +82,8 @@ class AdminRepository {
         final map = Map<String, dynamic>.from(data);
         return AdminModel.fromJson(map);
       },
-      queryBuilder: (collection) => collection.where('id', isEqualTo: authUid).limit(1),
+      queryBuilder: (collection) =>
+          collection.where('id', isEqualTo: authUid).limit(1),
     );
     return admins.isNotEmpty ? admins.first : null;
   }
@@ -82,7 +96,8 @@ class AdminRepository {
         final map = Map<String, dynamic>.from(data);
         return AdminModel.fromJson(map);
       },
-      queryBuilder: (collection) => collection.where('email', isEqualTo: email).limit(1),
+      queryBuilder: (collection) =>
+          collection.where('email', isEqualTo: email).limit(1),
     );
     return admins.isNotEmpty ? admins.first : null;
   }
@@ -94,10 +109,10 @@ class AdminRepository {
 
     _localStorageService.spWriteString(LocalStorageService.kAID, admin.id);
     _aid = admin.id;
-  
+
     _localStorageService.spWriteString(LocalStorageService.kAName, admin.name);
     _aName = admin.name;
-      final localAdminJson = {
+    final localAdminJson = {
       'id': admin.id,
       'email': admin.email,
       'name': admin.name,
@@ -106,26 +121,51 @@ class AdminRepository {
       'createdAt': admin.createdAt.toDate().toIso8601String(),
       'updatedAt': admin.updatedAt.toDate().toIso8601String(),
     };
-    _localStorageService.spWriteJson(LocalStorageService.kAdminData, localAdminJson);
+    _localStorageService.spWriteJson(
+      LocalStorageService.kAdminData,
+      localAdminJson,
+    );
     _isAdminLogout = false;
     _adminData = admin;
   }
 
   /// get admin data from locally on device
   Future getAdminData() async {
-    _isLogin = (await _localStorageService.spReadBool(LocalStorageService.kisLogin)) ?? false;
+    _isLogin =
+        (await _localStorageService.spReadBool(LocalStorageService.kisLogin)) ??
+        false;
     try {
       if (_isLogin) {
-        _aid = await _localStorageService.spReadString(LocalStorageService.kAID);
-        AdminModel? admin = await getAdminById(_aid!);
-        if (admin != null) {
-          _isAdminLogout = true;
-          if (!(admin.isAdminLogout ?? false)) {
-            await manageAdminDataLocally(admin);
+        // First, try to load cached admin data from local storage
+        final cachedAdminJson = await _localStorageService.spReadJson(
+          LocalStorageService.kAdminData,
+        );
+        if (cachedAdminJson != null) {
+          try {
+            _adminData = AdminModel.fromJson(cachedAdminJson);
+            _aid = _adminData?.id;
+            _aName = _adminData?.name;
             _isAdminLogout = false;
+          } catch (e) {
+            print('Error parsing cached admin data: $e');
           }
-        } else {
-          _isAdminLogout = true;
+        }
+
+        // Then fetch fresh data from Firestore to update
+        _aid = await _localStorageService.spReadString(
+          LocalStorageService.kAID,
+        );
+        if (_aid != null) {
+          AdminModel? admin = await getAdminById(_aid!);
+          if (admin != null) {
+            _isAdminLogout = true;
+            if (!(admin.isAdminLogout ?? false)) {
+              await manageAdminDataLocally(admin);
+              _isAdminLogout = false;
+            }
+          } else {
+            _isAdminLogout = true;
+          }
         }
       }
     } catch (e) {

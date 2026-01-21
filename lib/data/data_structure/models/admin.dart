@@ -10,19 +10,47 @@ class AdminModel {
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
-  AdminModel({required this.id, required this.email, required this.password, required this.name, required this.role, this.isAdminLogout=false, required this.createdAt, required this.updatedAt});
-
+  AdminModel({
+    required this.id,
+    required this.email,
+    required this.password,
+    required this.name,
+    required this.role,
+    this.isAdminLogout = false,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   factory AdminModel.fromJson(Map<String, dynamic> json) {
+    // Handle createdAt - can be Timestamp or ISO8601 string
+    Timestamp createdAt;
+    if (json['createdAt'] is Timestamp) {
+      createdAt = json['createdAt'];
+    } else if (json['createdAt'] is String) {
+      createdAt = Timestamp.fromDate(DateTime.parse(json['createdAt']));
+    } else {
+      createdAt = Timestamp.now();
+    }
+
+    // Handle updatedAt - can be Timestamp or ISO8601 string
+    Timestamp updatedAt;
+    if (json['updatedAt'] is Timestamp) {
+      updatedAt = json['updatedAt'];
+    } else if (json['updatedAt'] is String) {
+      updatedAt = Timestamp.fromDate(DateTime.parse(json['updatedAt']));
+    } else {
+      updatedAt = Timestamp.now();
+    }
+
     return AdminModel(
       id: json['id'],
       email: json['email'],
-      password: json['password'],
+      password: json['password'] ?? '',
       name: json['name'],
       role: json['role'],
       isAdminLogout: json['isAdminLogout'] ?? false,
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'], 
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -52,7 +80,6 @@ class AdminModel {
   //   JSON (Serializable)
   // ================================================================
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -65,6 +92,4 @@ class AdminModel {
       'updatedAt': updatedAt,
     };
   }
-
-
 }

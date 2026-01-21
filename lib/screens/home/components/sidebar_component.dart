@@ -26,6 +26,19 @@ class SidebarComponent extends StatefulWidget {
 }
 
 class _SidebarComponentState extends State<SidebarComponent> {
+ final adminRepo = AdminRepository.instance;
+  @override
+  void initState() {
+    super.initState();
+    _loadAdminData();
+  }
+
+  Future<void> _loadAdminData() async {
+    await adminRepo.getAdminData();
+    if (!mounted) return;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -70,8 +83,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
               subtitle: ResponsiveWidget.isMediumScreen(context)
                   ? null
                   : Text(
-                      AdminRepository.instance.adminData?.email ??
-                          appStrings.lblEmail,
+                      adminRepo.adminData?.email ?? '',
                       style: secondaryTextStyle(size: 12),
                     ),
               trailing: ResponsiveWidget.isMediumScreen(context)
@@ -150,15 +162,14 @@ class _SidebarComponentState extends State<SidebarComponent> {
               title: ResponsiveWidget.isMediumScreen(context)
                   ? null
                   : Text(
-                      AdminRepository.instance.adminData?.name ??
+                   adminRepo.adminData?.name ??
                           appStrings.lblUserName,
                       style: boldTextStyle(size: 14),
                     ),
               subtitle: ResponsiveWidget.isMediumScreen(context)
                   ? null
                   : Text(
-                      AdminRepository.instance.adminData?.role ??
-                          appStrings.lblEmail,
+                      adminRepo.adminData?.role ?? appStrings.lblEmail,
                       style: secondaryTextStyle(size: 12),
                     ),
             ),
