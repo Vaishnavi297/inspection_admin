@@ -34,14 +34,20 @@ class _SplashPageState extends State<SplashPage> {
     if (!mounted) return;
 
     if (adminRepo.isAdminLogout) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
       return;
     }
 
     if (adminRepo.isLogin) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.dashboard, (_) => false);
     } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
     }
   }
 
@@ -56,7 +62,10 @@ class _SplashPageState extends State<SplashPage> {
             Image.asset(AppAssets.imgLogo, height: s.s120, width: s.s120),
             Padding(
               padding: EdgeInsets.all(s.s8),
-              child: Text(appStrings.lblInspectionWV, style: boldTextStyle(size: FontSize.s32)),
+              child: Text(
+                appStrings.lblInspectionWV,
+                style: boldTextStyle(size: FontSize.s32),
+              ),
             ),
           ],
         ),

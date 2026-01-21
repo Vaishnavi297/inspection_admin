@@ -233,7 +233,35 @@ class _SidebarComponentState extends State<SidebarComponent> {
                   }
                 }
               }
-            : () => widget.onSelect?.call(index),
+            : () {
+                String route = AppRoutes.dashboard;
+                switch (index) {
+                  case 0:
+                    route = AppRoutes.dashboard;
+                    break;
+                  case 1:
+                    route = AppRoutes.county;
+                    break;
+                  case 2:
+                    route = AppRoutes.stations;
+                    break;
+                  case 3:
+                    route = AppRoutes.inspectors;
+                    break;
+                  case 4:
+                    route = AppRoutes.users;
+                    break;
+                  case 5:
+                    route = AppRoutes.vehicles;
+                    break;
+                  case 6:
+                    route = AppRoutes.inspections;
+                    break;
+                }
+                if (ModalRoute.of(context)?.settings.name != route) {
+                  Navigator.of(context).pushNamed(route);
+                }
+              },
       ),
     );
   }
