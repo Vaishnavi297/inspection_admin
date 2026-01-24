@@ -22,7 +22,9 @@ void main() {
 void initializeFirebase() async {
   try {
     print('=== FIREBASE DEBUG: Initializing Firebase... ===');
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     print('=== FIREBASE DEBUG: Firebase initialized successfully ===');
     await FirebaseCrashlyticsService.initialize();
     await LocalStorageService.instance.init();
@@ -41,13 +43,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: getAllBlocProviders(),
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: appStrings.lblAppName,
         theme: appTheme.lightTheme,
         themeMode: ThemeMode.light,
         debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.splash,
-        routes: getAllRoutes(),
+        routerConfig: AppRoutes.router,
       ),
     );
   }

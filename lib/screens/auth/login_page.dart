@@ -1,6 +1,7 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:inspection_station/data/data_structure/models/admin.dart';
 import 'package:inspection_station/utils/common/responsive_widget.dart';
 
@@ -41,7 +42,12 @@ class _LoginPageState extends State<LoginPage> {
 
     if (formKey.currentState?.validate() ?? false) {
       // Dispatch login event to bloc
-      context.read<SignInBloc>().add(SignInWithEmailEvent(email: emailTextController.text.trim(), password: passwordTextController.text.trim()));
+      context.read<SignInBloc>().add(
+        SignInWithEmailEvent(
+          email: emailTextController.text.trim(),
+          password: passwordTextController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -81,17 +87,26 @@ class _LoginPageState extends State<LoginPage> {
           // Persist admin data locally for sidebar/profile display
           AdminRepository.instance.manageAdminDataLocally(state.loginAdmin);
           // Navigate to home on successful login
-          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+          context.go(AppRoutes.dashboard);
         } else if (state is SignInError) {
           // Show error message
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage ?? 'Login failed. Please check your credentials.'), backgroundColor: Colors.red, duration: const Duration(seconds: 4)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.errorMessage ??
+                    'Login failed. Please check your credentials.',
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
         }
       },
       child: Scaffold(
         body: Container(
-          width: ResponsiveWidget.isSmallScreen(context) ? MediaQuery.of(context).size.width : MediaQuery.of(context).size.width * 0.3,
+          width: ResponsiveWidget.isSmallScreen(context)
+              ? MediaQuery.of(context).size.width
+              : MediaQuery.of(context).size.width * 0.3,
           margin: EdgeInsets.all(s.s16),
           decoration: boxDecorationRoundedWithShadow(16),
           child: Column(
@@ -110,12 +125,18 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Text(
                             appStrings.lblAdminLogin,
-                            style: primaryTextStyle(size: s.s20, fontWeight: FontWeight.w600),
+                            style: primaryTextStyle(
+                              size: s.s20,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           SizedBox(height: s.s8),
                           Text(
                             appStrings.lblBySigningInspectionWV,
-                            style: secondaryTextStyle(size: s.s14, fontWeight: FontWeight.w200),
+                            style: secondaryTextStyle(
+                              size: s.s14,
+                              fontWeight: FontWeight.w200,
+                            ),
                           ),
                         ],
                       ).paddingSymmetric(horizontal: 16, vertical: 8),
@@ -125,7 +146,10 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           textField(
                             controller: emailTextController,
-                            validator: (v) => Validators.validateRequired(v, fieldName: appStrings.lblUserName),
+                            validator: (v) => Validators.validateRequired(
+                              v,
+                              fieldName: appStrings.lblUserName,
+                            ),
                             labelText: appStrings.lblUserName,
                             hintText: appStrings.lblEnterUserName,
                             prefixIcon: const Icon(Icons.person),
@@ -155,17 +179,28 @@ class _LoginPageState extends State<LoginPage> {
                     spacing: 8,
                     children: [
                       AppButton(
-                        strTitle: isLoading ? 'Signing In...' : appStrings.lblSignIn,
+                        strTitle: isLoading
+                            ? 'Signing In...'
+                            : appStrings.lblSignIn,
                         fontColor: appColors.textPrimaryColor,
                         backgroundColor: appColors.primaryColor,
                         isDisable: isLoading,
                         onTap: isLoading ? null : _login,
                       ),
                       TextButton(
-                        onPressed: isLoading ? null : () => _login(useDemoCredentials: true),
+                        onPressed: isLoading
+                            ? null
+                            : () => _login(useDemoCredentials: true),
                         child: Text(
                           'Use Demo Credentials',
-                          style: secondaryTextStyle(size: s.s14, fontWeight: FontWeight.w200).copyWith(color: appColors.primaryColor, decoration: TextDecoration.underline),
+                          style:
+                              secondaryTextStyle(
+                                size: s.s14,
+                                fontWeight: FontWeight.w200,
+                              ).copyWith(
+                                color: appColors.primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
                         ),
                       ),
                     ],

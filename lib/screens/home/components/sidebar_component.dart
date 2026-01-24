@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
 import 'package:inspection_station/utils/constants/app_strings.dart';
 
@@ -26,7 +27,7 @@ class SidebarComponent extends StatefulWidget {
 }
 
 class _SidebarComponentState extends State<SidebarComponent> {
- final adminRepo = AdminRepository.instance;
+  final adminRepo = AdminRepository.instance;
   @override
   void initState() {
     super.initState();
@@ -55,16 +56,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
               leading: SizedBox(
                 width: ResponsiveWidget.isMediumScreen(context) ? 48 : 40,
                 height: ResponsiveWidget.isMediumScreen(context) ? 48 : 40,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 4,
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: AssetImage(AppAssets.imgAppLogo),
-                  ),
-                ),
+                child: Image.asset(AppAssets.imgLogo),
               ),
               minLeadingWidth: 0,
               horizontalTitleGap: 12,
@@ -162,8 +154,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
               title: ResponsiveWidget.isMediumScreen(context)
                   ? null
                   : Text(
-                   adminRepo.adminData?.name ??
-                          appStrings.lblUserName,
+                      adminRepo.adminData?.name ?? appStrings.lblUserName,
                       style: boldTextStyle(size: 14),
                     ),
               subtitle: ResponsiveWidget.isMediumScreen(context)
@@ -237,10 +228,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
                   await LocalStorageService.instance.clearAllLocal();
                   await LocalStorageService.instance.clearAllSecure();
                   if (context.mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.login,
-                      (route) => false,
-                    );
+                    context.go(AppRoutes.login);
                   }
                 }
               }
@@ -269,8 +257,11 @@ class _SidebarComponentState extends State<SidebarComponent> {
                     route = AppRoutes.inspections;
                     break;
                 }
-                if (ModalRoute.of(context)?.settings.name != route) {
-                  Navigator.of(context).pushNamed(route);
+                if (GoRouterState.of(context).uri.path != route) {
+                  if (widget.onSelect != null) {
+                    widget.onSelect!(index);
+                  }
+                  context.go(route);
                 }
               },
       ),

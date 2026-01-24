@@ -1,5 +1,6 @@
 import 'package:inspection_station/utils/extensions/duration_extension.dart';
 import 'package:inspection_station/utils/extensions/int_extension.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/repositories/admin_repository/admin_repository.dart';
 import '../../utils/routes/app_routes.dart';
@@ -34,20 +35,14 @@ class _SplashPageState extends State<SplashPage> {
     if (!mounted) return;
 
     if (adminRepo.isAdminLogout) {
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+      context.go(AppRoutes.login);
       return;
     }
 
     if (adminRepo.isLogin) {
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.dashboard, (_) => false);
+      context.go(AppRoutes.dashboard);
     } else {
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+      context.go(AppRoutes.login);
     }
   }
 
