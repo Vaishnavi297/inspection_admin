@@ -42,6 +42,19 @@ class Vehicle {
   });
 
   factory Vehicle.fromJson(Map<String, dynamic> json) {
+    Timestamp? parseTimestamp(dynamic value) {
+      if (value == null) return null;
+      if (value is Timestamp) return value;
+      if (value is String) {
+        try {
+          return Timestamp.fromDate(DateTime.parse(value));
+        } catch (_) {
+          return null;
+        }
+      }
+      return null;
+    }
+
     return Vehicle(
       vId: json['v_id'],
       cID: json['c_id'],
@@ -52,15 +65,17 @@ class Vehicle {
       vVin: json['v_vin'],
       vState: json['v_state'],
       vCurrentInspectionSticker: json['v_current_inspection_sticker'],
-      vLastInspectionDate: json['v_last_inspection_date'] != null ? Timestamp.fromDate(DateTime.parse(json['v_last_inspection_date'])) : null,
+      vLastInspectionDate: parseTimestamp(json['v_last_inspection_date']),
       vActivationStatus: json['v_activation_status'],
       documentVerificationStatus: json['document_verification_status'],
-      insuranceDocumentsIdList: (json['insurance_documents_id_list'] as List?)?.toList(),
-      registrationDocumentsIdList: (json['registration_documents_id_list'] as List?)?.toList(),
+      insuranceDocumentsIdList: (json['insurance_documents_id_list'] as List?)
+          ?.toList(),
+      registrationDocumentsIdList:
+          (json['registration_documents_id_list'] as List?)?.toList(),
       vModel: json['v_model'],
       vMileage: json['v_mileage'],
-      createTime: json['create_time'] != null ? Timestamp.fromDate(DateTime.parse(json['create_time'])) : null,
-      updateTime: json['update_time'] != null ? Timestamp.fromDate(DateTime.parse(json['update_time'])) : null,
+      createTime: parseTimestamp(json['create_time']),
+      updateTime: parseTimestamp(json['update_time']),
     );
   }
 
@@ -116,12 +131,16 @@ class Vehicle {
       vImageUrl: vImageUrl ?? this.vImageUrl,
       vVin: vVin ?? this.vVin,
       vState: vState ?? this.vState,
-      vCurrentInspectionSticker: vCurrentInspectionSticker ?? this.vCurrentInspectionSticker,
+      vCurrentInspectionSticker:
+          vCurrentInspectionSticker ?? this.vCurrentInspectionSticker,
       vLastInspectionDate: vLastInspectionDate ?? this.vLastInspectionDate,
       vActivationStatus: vActivationStatus ?? this.vActivationStatus,
-      documentVerificationStatus: documentVerificationStatus ?? this.documentVerificationStatus,
-      insuranceDocumentsIdList: insuranceDocumentsIdList ?? this.insuranceDocumentsIdList,
-      registrationDocumentsIdList: registrationDocumentsIdList ?? this.registrationDocumentsIdList,
+      documentVerificationStatus:
+          documentVerificationStatus ?? this.documentVerificationStatus,
+      insuranceDocumentsIdList:
+          insuranceDocumentsIdList ?? this.insuranceDocumentsIdList,
+      registrationDocumentsIdList:
+          registrationDocumentsIdList ?? this.registrationDocumentsIdList,
       vModel: vModel ?? this.vModel,
       vMileage: vMileage ?? this.vMileage,
       createTime: createTime ?? this.createTime,

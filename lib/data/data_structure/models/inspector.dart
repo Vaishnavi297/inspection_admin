@@ -36,6 +36,19 @@ class Inspector {
   });
 
   factory Inspector.fromJson(Map<String, dynamic> json) {
+    Timestamp? parseTimestamp(dynamic value) {
+      if (value == null) return null;
+      if (value is Timestamp) return value;
+      if (value is String) {
+        try {
+          return Timestamp.fromDate(DateTime.parse(value));
+        } catch (_) {
+          return null;
+        }
+      }
+      return null;
+    }
+
     return Inspector(
       inspectorId: json['inspector_id'] as String?,
       firstName: json['first_name'] as String,
@@ -46,12 +59,18 @@ class Inspector {
       stationId: json['station_id'] as String?,
       stationName: json['station_name'] as String?,
       isActive: (json['is_active'] as bool?) ?? true,
-      createdAt: json['created_at'] != null ? json['created_at'] as Timestamp : null,
-      updatedAt: json['updated_at'] != null ? json['updated_at'] as Timestamp : null,
-      lastLogin: json['last_login'] != null ? json['last_login'] as Timestamp : null,
-      totalInspections: json['total_inspections'] != null ? (json['total_inspections'] as num).toInt() : null,
-      passRate: json['pass_rate'] != null ? (json['pass_rate'] as num).toDouble() : null,
-      avgDaily: json['avg_daily'] != null ? (json['avg_daily'] as num).toInt() : null,
+      createdAt: parseTimestamp(json['created_at']),
+      updatedAt: parseTimestamp(json['updated_at']),
+      lastLogin: parseTimestamp(json['last_login']),
+      totalInspections: json['total_inspections'] != null
+          ? (json['total_inspections'] as num).toInt()
+          : null,
+      passRate: json['pass_rate'] != null
+          ? (json['pass_rate'] as num).toDouble()
+          : null,
+      avgDaily: json['avg_daily'] != null
+          ? (json['avg_daily'] as num).toInt()
+          : null,
     );
   }
 

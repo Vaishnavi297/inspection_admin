@@ -48,15 +48,26 @@ class Inspection {
   });
 
   factory Inspection.fromJson(Map<String, dynamic> json) {
+    Timestamp? parseTimestamp(dynamic value) {
+      if (value == null) return null;
+      if (value is Timestamp) return value;
+      if (value is String) {
+        try {
+          return Timestamp.fromDate(DateTime.parse(value));
+        } catch (_) {
+          return null;
+        }
+      }
+      return null;
+    }
+
     return Inspection(
       appointmentApprovalStatus: json['appointment_approval_status'],
-      appointmentDateTime: json['appointment_date_time'] is Timestamp
-          ? json['appointment_date_time']
-          : null,
+      appointmentDateTime: parseTimestamp(json['appointment_date_time']),
       appointmentId: json['appointment_id'],
       cId: json['c_id'],
       countyId: json['county_id'],
-      createTime: json['create_time'] is Timestamp ? json['create_time'] : null,
+      createTime: parseTimestamp(json['create_time']),
       inspectionDeclineReason: json['inspection_decline_reason'],
       inspectionDocumentImage: json['inspection_document_image'],
       inspectionNote: json['inspection_note'],
@@ -64,7 +75,7 @@ class Inspection {
       inspectionType: json['inspection_type'],
       isScheduledForLater: json['is_scheduled_for_later'],
       stationId: json['station_id'],
-      updateTime: json['update_time'] is Timestamp ? json['update_time'] : null,
+      updateTime: parseTimestamp(json['update_time']),
       vId: json['v_id'],
       vName: json['v_name'],
       vStates: json['v_states'],

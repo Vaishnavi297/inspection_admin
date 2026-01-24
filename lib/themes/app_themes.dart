@@ -19,7 +19,6 @@ class AppTheme {
     appBarTheme: AppBarTheme(
       backgroundColor: appColors.backgroundColor,
       elevation: 0,
-      titleTextStyle: GoogleFonts.ptSans(fontSize: FontSize.s20, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
       iconTheme: IconThemeData(color: appColors.primaryTextColor),
     ),
 
