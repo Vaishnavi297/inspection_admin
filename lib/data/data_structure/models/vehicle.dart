@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Vehicle {
   final String? vId;
   final String? cID;
@@ -8,15 +10,15 @@ class Vehicle {
   final String? vVin;
   final String? vState;
   final String? vCurrentInspectionSticker;
-  final DateTime? vLastInspectionDate;
+  final Timestamp? vLastInspectionDate;
   final bool? vActivationStatus;
   final String? documentVerificationStatus;
   final List<dynamic>? insuranceDocumentsIdList;
   final List<dynamic>? registrationDocumentsIdList;
   final String? vModel;
   final String? vMileage;
-  final DateTime? createTime;
-  final DateTime? updateTime;
+  final Timestamp? createTime;
+  final Timestamp? updateTime;
 
   const Vehicle({
     this.vId,
@@ -50,15 +52,15 @@ class Vehicle {
       vVin: json['v_vin'],
       vState: json['v_state'],
       vCurrentInspectionSticker: json['v_current_inspection_sticker'],
-      vLastInspectionDate: json['v_last_inspection_date'] != null ? DateTime.parse(json['v_last_inspection_date']) : null,
+      vLastInspectionDate: json['v_last_inspection_date'] != null ? Timestamp.fromDate(DateTime.parse(json['v_last_inspection_date'])) : null,
       vActivationStatus: json['v_activation_status'],
       documentVerificationStatus: json['document_verification_status'],
       insuranceDocumentsIdList: (json['insurance_documents_id_list'] as List?)?.toList(),
       registrationDocumentsIdList: (json['registration_documents_id_list'] as List?)?.toList(),
       vModel: json['v_model'],
       vMileage: json['v_mileage'],
-      createTime: json['create_time'] != null ? DateTime.parse(json['create_time']) : null,
-      updateTime: json['update_time'] != null ? DateTime.parse(json['update_time']) : null,
+      createTime: json['create_time'] != null ? Timestamp.fromDate(DateTime.parse(json['create_time'])) : null,
+      updateTime: json['update_time'] != null ? Timestamp.fromDate(DateTime.parse(json['update_time'])) : null,
     );
   }
 
@@ -73,15 +75,15 @@ class Vehicle {
       'v_vin': vVin,
       'v_state': vState,
       'v_current_inspection_sticker': vCurrentInspectionSticker,
-      'v_last_inspection_date': vLastInspectionDate?.toIso8601String(),
+      'v_last_inspection_date': vLastInspectionDate,
       'v_activation_status': vActivationStatus,
       'document_verification_status': documentVerificationStatus,
       'insurance_documents_id_list': insuranceDocumentsIdList,
       'registration_documents_id_list': registrationDocumentsIdList,
       'v_model': vModel,
       'v_mileage': vMileage,
-      'create_time': createTime?.toIso8601String(),
-      'update_time': updateTime?.toIso8601String(),
+      'create_time': createTime,
+      'update_time': updateTime,
     };
   }
 
@@ -95,15 +97,15 @@ class Vehicle {
     String? vVin,
     String? vState,
     String? vCurrentInspectionSticker,
-    DateTime? vLastInspectionDate,
+    Timestamp? vLastInspectionDate,
     bool? vActivationStatus,
     String? documentVerificationStatus,
     List<dynamic>? insuranceDocumentsIdList,
     List<dynamic>? registrationDocumentsIdList,
     String? vModel,
     String? vMileage,
-    DateTime? createTime,
-    DateTime? updateTime,
+    Timestamp? createTime,
+    Timestamp? updateTime,
   }) {
     return Vehicle(
       vId: vId ?? this.vId,

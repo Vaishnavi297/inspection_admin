@@ -12,16 +12,7 @@ class InspectorRepository {
   final String _collectionPath = 'inspectors';
   final String _stationCollectionPath = 'inspection_stations';
 
-  /// Creates an inspector and atomically increments the station's inspector count.
-  /// Rollbacks if station update fails.
-  ///
-  /// Detailed steps:
-  /// 1. Run Transaction.
-  /// 2. Read Target Station.
-  /// 3. Validate Station Exists and is Active (if applicable).
-  /// 4. Create Inspector Document.
-  /// 5. Increment Station 'inspactors' count.
-  Future<void> createInspectorTransaction(Inspector inspector) async {
+  Future<void> createInspector(Inspector inspector) async {
     final stationId = inspector.stationId;
     if (stationId == null || stationId.isEmpty) {
       throw Exception('Inspector must be assigned to a station');
@@ -64,10 +55,6 @@ class InspectorRepository {
       transaction.update(stationRef, {'inspactors': currentCount + 1});
     });
   }
-
-  /// Updates an inspector.
-  /// - If station changes: Atomic move (Old--, New++).
-  /// - If only details change: Normal update.
   Future<void> updateInspectorTransaction(Inspector newInspector) async {
     final inspectorId = newInspector.inspectorId;
     if (inspectorId == null) {
@@ -191,10 +178,7 @@ class InspectorRepository {
     return items;
   }
 
-  /// Toggle Active status - Does NOT affect station count per current requirements
-  /// unless we decide "active count" is what matters.
-  /// The prompt said "If inspector details change without station change -> do NOT modify count".
-  /// So changing status (active/inactive) is a "detail change", so count is NOT modified.
+
   Future<void> toggleActive(String id, bool isActive) async {
     await _firestoreService.updateDocument('$_collectionPath/$id', {
       'is_active': isActive,

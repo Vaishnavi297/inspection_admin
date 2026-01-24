@@ -767,13 +767,13 @@ List<DataRow> groupedDataRows(
         mainCells.add(
           isEditing
               ? _buildEditActionCells(absoluteIndex, onSaveEdit, onCancelEdit)
-              : buildActionCell(context, row, rowActions!, onView, onExecute, onRenew, onModify, onDelete, () => onStartEdit?.call(absoluteIndex)),
+              : buildActionCell(context, row, rowActions, onView, onExecute, onRenew, onModify, onDelete, () => onStartEdit?.call(absoluteIndex)),
         );
       }
 
       // Add main row
       rows.add(
-        DataRow(selected: isSelected, onSelectChanged: hasCheckboxes ? (selected) => onRowSelected?.call(pageRelativeIndex, selected) : null, color: WidgetStateProperty.all(color), cells: mainCells),
+        DataRow(selected: isSelected, onSelectChanged: hasCheckboxes ? (selected) => onRowSelected.call(pageRelativeIndex, selected) : null, color: WidgetStateProperty.all(color), cells: mainCells),
       );
 
       // Add expanded row if needed
@@ -885,11 +885,11 @@ List<DataRow> groupedDataRows(
       rows.add(
         DataRow(
           selected: isSelected,
-          onSelectChanged: hasCheckboxes ? (selected) => onRowSelected?.call(originalIndex, selected) : null,
+          onSelectChanged: hasCheckboxes ? (selected) => onRowSelected.call(originalIndex, selected) : null,
           color: WidgetStateProperty.all(color),
           cells: [
             if (isMobile) DataCell(IconButton(icon: Icon(isExpanded ? Icons.expand_more : Icons.chevron_right), onPressed: () => onExpandChanged?.call(absoluteIndex, !isExpanded))),
-            if (hasCheckboxes) DataCell(Checkbox(value: isSelected, onChanged: (selected) => onRowSelected?.call(originalIndex, selected))),
+            if (hasCheckboxes) DataCell(Checkbox(value: isSelected, onChanged: (selected) => onRowSelected.call(originalIndex, selected))),
             ...visibleColumns.map((col) {
               if (col.toLowerCase() == "image" || col.toLowerCase() == "photo" || col.toLowerCase() == "profilepic") {
                 final value = row[col];

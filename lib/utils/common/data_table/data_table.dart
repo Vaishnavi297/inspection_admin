@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:inspection_station/components/app_text_field/app_textfield.dart';
 import 'package:inspection_station/components/app_text_style/app_text_style.dart';
-import 'package:inspection_station/utils/common/drop_down/utils.dart';
+import 'package:inspection_station/utils/common/data_table/utils.dart';
 import 'package:inspection_station/utils/constants/app_dimension.dart';
 
 import '../../constants/app_colors.dart';

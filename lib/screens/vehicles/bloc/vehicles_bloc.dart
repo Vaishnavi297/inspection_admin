@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/data_structure/models/vehicle.dart';
 import '../../../data/repositories/vehicle_repository/vehicle_repository.dart';
@@ -44,8 +45,8 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
         registrationDocumentsIdList: event.registrationDocumentsIdList,
         vModel: event.vModel,
         vMileage: event.vMileage,
-        createTime: DateTime.now(),
-        updateTime: DateTime.now(),
+        createTime: Timestamp.now(),
+        updateTime: Timestamp.now(),
       );
       await _repo.addVehicle(vehicle);
       final list = await _repo.getAllVehicles();
@@ -74,7 +75,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
         registrationDocumentsIdList: event.registrationDocumentsIdList,
         vModel: event.vModel,
         vMileage: event.vMileage,
-        updateTime: DateTime.now(),
+        updateTime: Timestamp.now(),
       );
       await _repo.setVehicle(event.vehicle.vId!, updated);
       final list = await _repo.getAllVehicles();

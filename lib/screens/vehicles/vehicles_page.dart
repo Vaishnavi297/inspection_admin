@@ -5,8 +5,8 @@ import '../../components/app_dialog/app_custom_dialog.dart';
 import '../../components/app_text_style/app_text_style.dart';
 import '../../components/loader_view.dart';
 import '../../data/data_structure/models/vehicle.dart';
-import '../../utils/common/drop_down/data_table.dart';
-import '../../utils/common/drop_down/utils.dart';
+import '../../utils/common/data_table/data_table.dart';
+import '../../utils/common/data_table/utils.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import 'bloc/vehicles_bloc.dart';
@@ -90,7 +90,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
     final columns = ['Sr. No.', 'Plate', 'VIN', 'Name', 'Title', 'Model', 'State', 'Sticker', 'Last Inspection', 'Status'];
     final data = vehicles.asMap().entries.map((e) {
       final v = e.value;
-      final last = v.vLastInspectionDate;
+      final last = v.vLastInspectionDate?.toDate();
       final lastStr = last == null ? '-' : '${last.day.toString().padLeft(2, '0')}/${last.month.toString().padLeft(2, '0')}/${last.year}';
       return {
         'Sr. No.': (e.key + 1).toString(),

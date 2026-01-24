@@ -6,8 +6,8 @@ import '../../components/app_dialog/app_custom_dialog.dart';
 import '../../components/app_text_style/app_text_style.dart';
 import '../../components/loader_view.dart';
 import '../../data/data_structure/models/inspection.dart';
-import '../../utils/common/drop_down/data_table.dart';
-import '../../utils/common/drop_down/utils.dart';
+import '../../utils/common/data_table/data_table.dart';
+import '../../utils/common/data_table/utils.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import 'bloc/inspection_bloc.dart';
@@ -101,33 +101,44 @@ class _InspectionPageState extends State<InspectionPage> {
 
   Widget _dataTableWidget(BuildContext context, List<Inspection> inspections) {
     final columns = [
-      'Appointment Date',
+      'Time',
       'Vehicle',
-      'Station ID',
-      'Approval',
-      'Status',
+      'Station',
+      'Inspector',
+      'VIN',
+     // 'Title',
+      'Sticker',
+      'Type',
+      'Result',
+      'Source',
     ];
     final data = inspections.map((inspection) {
-      final date = inspection.appointmentDateTime != null
-          ? DateFormat(
-              'MMM dd, yyyy HH:mm',
-            ).format(inspection.appointmentDateTime!.toDate())
+      final time = inspection.appointmentDateTime != null
+          ? DateFormat('HH:mm').format(inspection.appointmentDateTime!.toDate())
           : '-';
       final vehicle = '${inspection.vTitle ?? ''} ${inspection.vName ?? ''}';
-      final approval = inspection.appointmentApprovalStatus ?? '-';
-      // Assuming 'status' is not explicitly in the root except appointmentApprovalStatus,
-      // but there are other fields. I'll stick to what's available.
-      // There is no explicit 'status' field in the model I created other than appointmentApprovalStatus.
-      // Ah, wait, in Appointment model there is 'status'. In Inspection model there is 'appointmentApprovalStatus'.
-      // I'll display approval status.
+      final vin = inspection.vId ?? '-';
+    //  final title = inspection.vTitle ?? '-';
+      final sticker = inspection.inspectionSticker ?? '-';
+      final type = inspection.inspectionType ?? '-';
+      final result = inspection.appointmentApprovalStatus ?? '-';
+      final source = inspection.isScheduledForLater == true
+          ? 'Scheduled'
+          : 'Walk-in';
+      final station = inspection.stationName ?? inspection.stationId ?? '-';
+      final inspector = inspection.inspectorName ?? '-';
+
       return {
-        'Appointment Date': date,
+        'Time': time,
         'Vehicle': vehicle.trim().isEmpty ? '-' : vehicle,
-        'Station ID': inspection.stationId ?? '-',
-        'Approval': approval,
-        'Status': inspection.isScheduledForLater == true
-            ? 'Later'
-            : 'Now', // Just an example mapping
+        'Station': station,
+        'Inspector': inspector,
+        'VIN': vin,
+       // 'Title': title,
+        'Sticker': sticker,
+        'Type': type,
+        'Result': result,
+        'Source': source,
         '_model': inspection,
       };
     }).toList();

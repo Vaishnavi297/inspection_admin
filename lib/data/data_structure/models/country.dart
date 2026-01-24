@@ -52,7 +52,7 @@ class County {
     return County(
       countyId: countyId ?? this.countyId,
       countyName: countyName ?? this.countyName,
-      countyLowerName: countyLowerName ?? this.countyLowerName,
+      countyLowerName: countyLowerName ,
       createTime: createTime ?? this.createTime,
       updateTime: updateTime ?? this.updateTime,
     );

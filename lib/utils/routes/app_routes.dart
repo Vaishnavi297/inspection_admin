@@ -18,8 +18,8 @@ import '../../screens/users/users_page.dart';
 import '../../screens/users/bloc/users_bloc.dart';
 import '../../screens/vehicles/vehicles_page.dart';
 import '../../screens/vehicles/bloc/vehicles_bloc.dart';
-import '../../screens/inspection/inspection_page.dart';
-import '../../screens/inspection/bloc/inspection_bloc.dart';
+import '../../screens/inspections/inspection_page.dart';
+import '../../screens/inspections/bloc/inspection_bloc.dart';
 
 class AppRoutes {
   static const String splash = '/splash';

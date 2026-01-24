@@ -14,8 +14,8 @@ import '../county/county_page.dart';
 import '../county/bloc/county_bloc.dart';
 import '../vehicles/vehicles_page.dart';
 import '../vehicles/bloc/vehicles_bloc.dart';
-import '../inspection/inspection_page.dart';
-import '../inspection/bloc/inspection_bloc.dart';
+import '../inspections/inspection_page.dart';
+import '../inspections/bloc/inspection_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

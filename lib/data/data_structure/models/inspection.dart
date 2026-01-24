@@ -20,6 +20,8 @@ class Inspection {
   final String? vStates;
   final String? vTitle;
   final String? walkInInspectionNotes;
+  final String? stationName;
+  final String? inspectorName;
 
   const Inspection({
     this.appointmentApprovalStatus,
@@ -41,6 +43,8 @@ class Inspection {
     this.vStates,
     this.vTitle,
     this.walkInInspectionNotes,
+    this.stationName,
+    this.inspectorName,
   });
 
   factory Inspection.fromJson(Map<String, dynamic> json) {
@@ -66,6 +70,8 @@ class Inspection {
       vStates: json['v_states'],
       vTitle: json['v_title'],
       walkInInspectionNotes: json['walk_in_inspection_notes'],
+      stationName: json['station_name'],
+      inspectorName: json['inspector_name'],
     );
   }
 
@@ -90,6 +96,8 @@ class Inspection {
       'v_states': vStates,
       'v_title': vTitle,
       'walk_in_inspection_notes': walkInInspectionNotes,
+      'station_name': stationName,
+      'inspector_name': inspectorName,
     };
   }
 
@@ -113,6 +121,8 @@ class Inspection {
     String? vStates,
     String? vTitle,
     String? walkInInspectionNotes,
+    String? stationName,
+    String? inspectorName,
   }) {
     return Inspection(
       appointmentApprovalStatus:
@@ -138,6 +148,8 @@ class Inspection {
       vTitle: vTitle ?? this.vTitle,
       walkInInspectionNotes:
           walkInInspectionNotes ?? this.walkInInspectionNotes,
+      stationName: stationName ?? this.stationName,
+      inspectorName: inspectorName ?? this.inspectorName,
     );
   }
 }

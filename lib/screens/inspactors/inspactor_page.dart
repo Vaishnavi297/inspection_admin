@@ -4,8 +4,8 @@ import '../../components/app_button/app_button.dart';
 import '../../components/app_dialog/app_custom_dialog.dart';
 import '../../components/app_text_style/app_text_style.dart';
 import '../../components/loader_view.dart';
-import '../../utils/common/drop_down/data_table.dart';
-import '../../utils/common/drop_down/utils.dart';
+import '../../utils/common/data_table/data_table.dart';
+import '../../utils/common/data_table/utils.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import '../../data/data_structure/models/inspector.dart';
@@ -61,7 +61,7 @@ class _InspactorsPageState extends State<InspactorsPage> {
                       ],
                     ),
                     AppButton(
-                      onTap: () => _onAddInspactorTap(context),
+                      onTap: () => _onAddInspactorTap(),
                       width: 180,
                       height: 40,
                       btnWidget: Text('Add New Inspector', style: boldTextStyle(size: FontSize.s14)),
@@ -171,7 +171,7 @@ class _InspactorsPageState extends State<InspactorsPage> {
     );
   }
 
-  Future<void> _onAddInspactorTap(BuildContext context) async {
+  Future<void> _onAddInspactorTap() async {
     final result = await showDialog(context: context, builder: (context) => const AddInspactorPage());
     if (result is Map && result['firstName'] != null && result['lastName'] != null) {
       context.read<InspactorBloc>().add(

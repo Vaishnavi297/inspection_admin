@@ -134,6 +134,7 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
                           controller: _phoneController,
                           labelText: 'Phone Number *',
                           hintText: '(304) 555-0123',
+                          inputType: TextInputType.phone,
                           validator: (v) => (v == null || v.trim().isEmpty)
                               ? 'Required'
                               : null,
@@ -241,8 +242,9 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
   }
 
   void _onSave() {
-    if (_formKey.currentState?.validate() != true || _selectedStation == null)
+    if (_formKey.currentState?.validate() != true || _selectedStation == null) {
       return;
+    }
     Navigator.of(context).pop({
       'firstName': _firstNameController.text.trim(),
       'lastName': _lastNameController.text.trim(),

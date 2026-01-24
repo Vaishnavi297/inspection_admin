@@ -13,7 +13,7 @@ class AddVehicleEvent extends VehiclesEvent {
   final String? vVin;
   final String? vState;
   final String? vCurrentInspectionSticker;
-  final DateTime? vLastInspectionDate;
+  final Timestamp? vLastInspectionDate;
   final bool? vActivationStatus;
   final String? documentVerificationStatus;
   final List<dynamic>? insuranceDocumentsIdList;
@@ -49,7 +49,7 @@ class UpdateVehicleEvent extends VehiclesEvent {
   final String? vVin;
   final String? vState;
   final String? vCurrentInspectionSticker;
-  final DateTime? vLastInspectionDate;
+  final Timestamp? vLastInspectionDate;
   final bool? vActivationStatus;
   final String? documentVerificationStatus;
   final List<dynamic>? insuranceDocumentsIdList;

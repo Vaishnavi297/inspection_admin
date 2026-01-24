@@ -51,7 +51,7 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       );
-      await _repo.createInspectorTransaction(inspector);
+      await _repo.createInspector(inspector);
       final list = await _repo.getAllInspectors();
       emit(InspactorLoaded(list));
     } catch (e) {
