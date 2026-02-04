@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../components/app_button/app_button.dart';
 import '../../components/app_dialog/app_custom_dialog.dart';
 import '../../components/app_text_style/app_text_style.dart';
 import '../../components/loader_view.dart';
 import '../../data/data_structure/models/vehicle.dart';
 import '../../utils/common/data_table/data_table.dart';
-import '../../utils/common/data_table/utils.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import 'bloc/vehicles_bloc.dart';
@@ -33,7 +31,12 @@ class _VehiclesPageState extends State<VehiclesPage> {
       body: BlocConsumer<VehiclesBloc, VehiclesState>(
         listener: (context, state) {
           if (state is VehiclesError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: appColors.errorColor));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: appColors.errorColor,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -50,12 +53,19 @@ class _VehiclesPageState extends State<VehiclesPage> {
                       children: [
                         Text(
                           'Vehicles',
-                          style: boldTextStyle(size: FontSize.s20, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
+                          style: boldTextStyle(
+                            size: FontSize.s20,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.primaryTextColor,
+                          ),
                         ),
                         SizedBox(height: s.s4),
                         Text(
                           'Manage registered vehicles',
-                          style: secondaryTextStyle(size: FontSize.s12, color: appColors.secondaryTextColor),
+                          style: secondaryTextStyle(
+                            size: FontSize.s12,
+                            color: appColors.secondaryTextColor,
+                          ),
                         ),
                       ],
                     ),
@@ -70,13 +80,19 @@ class _VehiclesPageState extends State<VehiclesPage> {
                 SizedBox(height: s.s16),
                 if (state is VehiclesLoading)
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   )
                 else if (state is VehiclesLoaded)
                   _dataTableWidget(state.vehicles)
                 else
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   ),
               ],
             ),
@@ -87,11 +103,24 @@ class _VehiclesPageState extends State<VehiclesPage> {
   }
 
   Widget _dataTableWidget(List<Vehicle> vehicles) {
-    final columns = ['Sr. No.', 'Plate', 'VIN', 'Name', 'Title', 'Model', 'State', 'Sticker', 'Last Inspection', 'Status'];
+    final columns = [
+      'Sr. No.',
+      'Plate',
+      'VIN',
+      'Name',
+      'Title',
+      'Model',
+      'State',
+      'Sticker',
+      'Last Inspection',
+      'Status',
+    ];
     final data = vehicles.asMap().entries.map((e) {
       final v = e.value;
       final last = v.vLastInspectionDate?.toDate();
-      final lastStr = last == null ? '-' : '${last.day.toString().padLeft(2, '0')}/${last.month.toString().padLeft(2, '0')}/${last.year}';
+      final lastStr = last == null
+          ? '-'
+          : '${last.day.toString().padLeft(2, '0')}/${last.month.toString().padLeft(2, '0')}/${last.year}';
       return {
         'Sr. No.': (e.key + 1).toString(),
         'Plate': v.vPlateNumber ?? '-',
@@ -110,8 +139,8 @@ class _VehiclesPageState extends State<VehiclesPage> {
     return DataTableWidget(
       columns: columns,
       data: data,
-      titleDatatableText: 'All Vehicles',
-      subTitleDatatableText: 'Manage registered vehicles',
+      titleDataTableText: 'All Vehicles',
+      subTitleDataTableText: 'Manage registered vehicles',
       headerColor: appColors.primaryColor,
       headerColumnColor: appColors.textPrimaryColor,
       cellTextColor: appColors.primaryTextColor,
@@ -159,7 +188,8 @@ class _VehiclesPageState extends State<VehiclesPage> {
               vActivationStatus: result['vActivationStatus'],
               documentVerificationStatus: result['documentVerificationStatus'],
               insuranceDocumentsIdList: result['insuranceDocumentsIdList'],
-              registrationDocumentsIdList: result['registrationDocumentsIdList'],
+              registrationDocumentsIdList:
+                  result['registrationDocumentsIdList'],
               vModel: result['vModel'],
               vMileage: result['vMileage'],
             ),
@@ -168,7 +198,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
       },
       onDelete: (row) async {
         final v = row['_model'] as Vehicle;
-        final shouldDelete = await AppCustomDialog.show<bool>(
+        await AppCustomDialog.show(
           context: context,
           icon: Icons.delete_outline,
           iconBackgroundColor: appColors.red,
@@ -177,12 +207,14 @@ class _VehiclesPageState extends State<VehiclesPage> {
           primaryButtonText: 'Delete',
           secondaryButtonText: 'Cancel',
           primaryButtonColor: appColors.red,
-          onPrimaryPressed: () => Navigator.of(context).pop(true),
+          onPrimaryPressed: () {
+            // Navigator.of(context).pop(true);
+            context.read<VehiclesBloc>().add(
+              DeleteVehicleEvent(vehicleId: v.vId ?? ''),
+            );
+          },
           onSecondaryPressed: () => Navigator.of(context).pop(false),
         );
-        if (shouldDelete == true) {
-          context.read<VehiclesBloc>().add(DeleteVehicleEvent(vehicleId: v.vId ?? ''));
-        }
       },
       // actionColumnName: 'Actions',
     );

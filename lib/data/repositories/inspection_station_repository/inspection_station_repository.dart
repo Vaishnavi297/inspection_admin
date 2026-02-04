@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../data_structure/models/inspaction_station.dart';
+import '../../data_structure/models/inspection_station.dart';
 import '../../services/firebase_service/firestore_service.dart';
 
-class InspactionStationRepository {
-  InspactionStationRepository._();
-  static final InspactionStationRepository instance =
-      InspactionStationRepository._();
+class InspectionStationRepository {
+  InspectionStationRepository._();
+  static final InspectionStationRepository instance =
+      InspectionStationRepository._();
 
   final _firestoreService = FirestoreService.instance;
   final String _collectionPath = 'inspection_stations';
 
-  Future<DocumentReference> addStation(InspactionStation station) async {
+  Future<DocumentReference> addStation(InspectionStation station) async {
     print('=== REPOSITORY DEBUG: Adding station to Firestore... ===');
     print('=== REPOSITORY DEBUG: Station data: ${station.toJson()} ===');
 
     try {
-      final ref = await _firestoreService.addDocument<InspactionStation>(
+      final ref = await _firestoreService.addDocument<InspectionStation>(
         _collectionPath,
         toFirestore: (s) => s.toJson(),
         data: station,
@@ -36,10 +36,10 @@ class InspactionStationRepository {
 
   Future<void> setStation(
     String id,
-    InspactionStation station, {
+    InspectionStation station, {
     bool merge = false,
   }) async {
-    await _firestoreService.setDocument<InspactionStation>(
+    await _firestoreService.setDocument<InspectionStation>(
       '$_collectionPath/$id',
       toFirestore: (s) => s.toJson(),
       data: station,
@@ -47,13 +47,13 @@ class InspactionStationRepository {
     );
   }
 
-  Future<List<InspactionStation>> getAllStations() async {
-    final items = await _firestoreService.getCollectionOnce<InspactionStation>(
+  Future<List<InspectionStation>> getAllStations() async {
+    final items = await _firestoreService.getCollectionOnce<InspectionStation>(
       _collectionPath,
       fromFirestore: (data, docId) {
         final map = Map<String, dynamic>.from(data);
         map['sId'] = docId;
-        return InspactionStation.fromJson(map);
+        return InspectionStation.fromJson(map);
       },
       queryBuilder: (collection) =>
           collection.orderBy('create_time', descending: false),
@@ -68,10 +68,10 @@ class InspactionStationRepository {
   /// Checks if a phone number is already registered.
   /// Returns true if duplicate exists.
   Future<bool> isPhoneRegistered(String phone) async {
-    final result = await _firestoreService.getCollectionOnce<InspactionStation>(
+    final result = await _firestoreService.getCollectionOnce<InspectionStation>(
       _collectionPath,
       fromFirestore: (data, id) =>
-          InspactionStation.fromJson({...data, 'sId': id}),
+          InspectionStation.fromJson({...data, 'sId': id}),
       queryBuilder: (query) =>
           query.where('station_contact_number', isEqualTo: phone).limit(1),
     );

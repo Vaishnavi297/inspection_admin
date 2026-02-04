@@ -5,7 +5,9 @@ import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import '../app_text_style/app_text_style.dart';
 
-/// A custom reusable dialog widget with dark theme and customizable content
+/// A reusable, safe dialog widget.
+/// - Dialog ALWAYS closes itself
+/// - Callers NEVER call Navigator.pop()
 class AppCustomDialog extends StatelessWidget {
   final IconData? icon;
   final Widget? iconWidget;
@@ -32,10 +34,13 @@ class AppCustomDialog extends StatelessWidget {
     this.onSecondaryPressed,
     this.primaryButtonColor,
     this.showIcon = true,
-  }) : assert(icon != null || iconWidget != null || !showIcon, 'Either icon or iconWidget must be provided if showIcon is true');
+  }) : assert(
+         icon != null || iconWidget != null || !showIcon,
+         'Either icon or iconWidget must be provided if showIcon is true',
+       );
 
-  /// Show the dialog with a static method for easy usage
-  static Future<T?> show<T>({
+  /// Show dialog helper
+  static Future<bool?> show({
     required BuildContext context,
     IconData? icon,
     Widget? iconWidget,
@@ -48,25 +53,36 @@ class AppCustomDialog extends StatelessWidget {
     VoidCallback? onSecondaryPressed,
     Color? primaryButtonColor,
     bool showIcon = true,
-    bool barrierDismissible = true,
+    bool barrierDismissible = false,
   }) {
-    return showDialog<T>(
+    return showDialog<bool>(
       context: context,
       barrierDismissible: barrierDismissible,
       barrierColor: Colors.black.withOpacity(0.7),
-      builder: (context) => AppCustomDialog(
-        icon: icon,
-        iconWidget: iconWidget,
-        iconBackgroundColor: iconBackgroundColor,
-        title: title,
-        message: message,
-        primaryButtonText: primaryButtonText,
-        secondaryButtonText: secondaryButtonText,
-        onPrimaryPressed: onPrimaryPressed,
-        onSecondaryPressed: onSecondaryPressed,
-        primaryButtonColor: primaryButtonColor,
-        showIcon: showIcon,
-      ),
+      builder: (dialogContext) {
+        return AppCustomDialog(
+          icon: icon,
+          iconWidget: iconWidget,
+          iconBackgroundColor: iconBackgroundColor,
+          title: title,
+          message: message,
+          primaryButtonText: primaryButtonText,
+          secondaryButtonText: secondaryButtonText,
+          primaryButtonColor: primaryButtonColor,
+          showIcon: showIcon,
+
+          /// IMPORTANT:
+          /// Dialog closes itself FIRST, then callback runs
+          onPrimaryPressed: () {
+            Navigator.of(dialogContext).pop(true);
+            onPrimaryPressed?.call();
+          },
+          onSecondaryPressed: () {
+            Navigator.of(dialogContext).pop(false);
+            onSecondaryPressed?.call();
+          },
+        );
+      },
     );
   }
 
@@ -79,22 +95,34 @@ class AppCustomDialog extends StatelessWidget {
       child: Container(
         width: ResponsiveWidget.isMediumScreen(context) ? 300 : 400,
         padding: const EdgeInsets.all(24),
-        decoration: boxDecorationWithRoundedCorners(backgroundColor: appColors.surfaceColor, borderRadius: BorderRadius.circular(20)),
+        decoration: boxDecorationWithRoundedCorners(
+          backgroundColor: appColors.surfaceColor,
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
+            /// ICON
             if (showIcon) ...[
               Container(
                 width: 64,
                 height: 64,
-                decoration: boxDecorationWithRoundedCorners(backgroundColor: iconBackgroundColor ?? appColors.red, boxShape: BoxShape.circle),
-                child: iconWidget ?? Icon(icon ?? Icons.info_outline, color: Colors.white, size: 32),
+                decoration: boxDecorationWithRoundedCorners(
+                  backgroundColor: iconBackgroundColor ?? appColors.red,
+                  boxShape: BoxShape.circle,
+                ),
+                child:
+                    iconWidget ??
+                    Icon(
+                      icon ?? Icons.info_outline,
+                      color: Colors.white,
+                      size: 32,
+                    ),
               ),
               const SizedBox(height: 20),
             ],
 
-            // Title
+            /// TITLE
             Text(
               title,
               textAlign: TextAlign.center,
@@ -102,7 +130,7 @@ class AppCustomDialog extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Message
+            /// MESSAGE
             Text(
               message,
               textAlign: TextAlign.center,
@@ -110,16 +138,18 @@ class AppCustomDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Primary Button
+            /// PRIMARY BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: onPrimaryPressed ?? () => Navigator.of(context).pop(true),
+                onPressed: onPrimaryPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryButtonColor ?? appColors.red,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(
@@ -129,15 +159,20 @@ class AppCustomDialog extends StatelessWidget {
               ),
             ),
 
-            // Secondary Button
+            /// SECONDARY BUTTON
             if (secondaryButtonText != null) ...[
               const SizedBox(height: 12),
               TextButton(
-                onPressed: onSecondaryPressed ?? () => Navigator.of(context).pop(false),
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
+                onPressed: onSecondaryPressed,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
                 child: Text(
                   secondaryButtonText!,
-                  style: primaryTextStyle(size: FontSize.s14, fontWeight: FontWeight.w500),
+                  style: primaryTextStyle(
+                    size: FontSize.s14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -148,56 +183,21 @@ class AppCustomDialog extends StatelessWidget {
   }
 }
 
-/// Pre-built logout confirmation dialog
-class LogoutConfirmationDialog extends StatelessWidget {
-  final VoidCallback? onLogout;
-  final VoidCallback? onCancel;
-
-  const LogoutConfirmationDialog({super.key, this.onLogout, this.onCancel});
-
-  static Future<bool?> show({required BuildContext context, VoidCallback? onLogout, VoidCallback? onCancel}) {
-    return AppCustomDialog.show<bool>(
+/// ------------------------------------------------------------
+/// Example: Logout confirmation dialog (SAFE)
+/// ------------------------------------------------------------
+class LogoutConfirmationDialog {
+  static Future<bool?> show(BuildContext context) {
+    return AppCustomDialog.show(
       context: context,
       icon: Icons.logout_rounded,
       iconBackgroundColor: appColors.red,
       title: 'Already leaving?',
-      message: 'We\'ll keep an eye on your rewards and coins while you\'re gone. And we will miss you a lot.',
+      message:
+          'We\'ll keep an eye on your rewards and coins while you\'re gone.',
       primaryButtonText: 'Yes, Log out',
       secondaryButtonText: 'No, I am staying',
       primaryButtonColor: appColors.red,
-      onPrimaryPressed:
-          onLogout ??
-          () {
-            Navigator.of(context).pop(true);
-          },
-      onSecondaryPressed:
-          onCancel ??
-          () {
-            Navigator.of(context).pop(false);
-          },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCustomDialog(
-      icon: Icons.logout_rounded,
-      iconBackgroundColor: appColors.red,
-      title: 'Already leaving?',
-      message: 'We\'ll keep an eye on your rewards and coins while you\'re gone. And we will miss you a lot.',
-      primaryButtonText: 'Yes, Log out',
-      secondaryButtonText: 'No, I am staying',
-      primaryButtonColor: appColors.red,
-      onPrimaryPressed:
-          onLogout ??
-          () {
-            Navigator.of(context).pop(true);
-          },
-      onSecondaryPressed:
-          onCancel ??
-          () {
-            Navigator.of(context).pop(false);
-          },
     );
   }
 }

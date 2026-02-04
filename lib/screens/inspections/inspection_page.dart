@@ -106,7 +106,7 @@ class _InspectionPageState extends State<InspectionPage> {
       'Station',
       'Inspector',
       'VIN',
-     // 'Title',
+      // 'Title',
       'Sticker',
       'Type',
       'Result',
@@ -118,7 +118,7 @@ class _InspectionPageState extends State<InspectionPage> {
           : '-';
       final vehicle = '${inspection.vTitle ?? ''} ${inspection.vName ?? ''}';
       final vin = inspection.vId ?? '-';
-    //  final title = inspection.vTitle ?? '-';
+      //  final title = inspection.vTitle ?? '-';
       final sticker = inspection.inspectionSticker ?? '-';
       final type = inspection.inspectionType ?? '-';
       final result = inspection.appointmentApprovalStatus ?? '-';
@@ -134,7 +134,7 @@ class _InspectionPageState extends State<InspectionPage> {
         'Station': station,
         'Inspector': inspector,
         'VIN': vin,
-       // 'Title': title,
+        // 'Title': title,
         'Sticker': sticker,
         'Type': type,
         'Result': result,
@@ -146,8 +146,8 @@ class _InspectionPageState extends State<InspectionPage> {
     return DataTableWidget(
       columns: columns,
       data: data,
-      titleDatatableText: 'All Inspections',
-      subTitleDatatableText: 'List of all inspections',
+      titleDataTableText: 'All Inspections',
+      subTitleDataTableText: 'List of all inspections',
       headerColor: appColors.primaryColor,
       headerColumnColor: appColors.textPrimaryColor,
       cellTextColor: appColors.primaryTextColor,
@@ -178,7 +178,7 @@ class _InspectionPageState extends State<InspectionPage> {
     BuildContext context,
     Inspection inspection,
   ) async {
-    final shouldDelete = await AppCustomDialog.show<bool>(
+    await AppCustomDialog.show(
       context: context,
       icon: Icons.delete_outline,
       iconBackgroundColor: appColors.red,
@@ -188,14 +188,15 @@ class _InspectionPageState extends State<InspectionPage> {
       primaryButtonText: 'Delete',
       secondaryButtonText: 'Cancel',
       primaryButtonColor: appColors.red,
-      onPrimaryPressed: () => Navigator.of(context).pop(true),
+      onPrimaryPressed: () {
+        // Navigator.of(context).pop(true);
+        if (inspection.appointmentId != null) {
+          context.read<InspectionBloc>().add(
+            DeleteInspectionEvent(inspectionId: inspection.appointmentId!),
+          );
+        }
+      },
       onSecondaryPressed: () => Navigator.of(context).pop(false),
     );
-
-    if (shouldDelete == true && inspection.appointmentId != null) {
-      context.read<InspectionBloc>().add(
-        DeleteInspectionEvent(inspectionId: inspection.appointmentId!),
-      );
-    }
   }
 }

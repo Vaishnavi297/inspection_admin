@@ -22,7 +22,6 @@ class CountyPage extends StatefulWidget {
 }
 
 class _CountyPageState extends State<CountyPage> {
-
   @override
   void initState() {
     super.initState();
@@ -37,7 +36,12 @@ class _CountyPageState extends State<CountyPage> {
       body: BlocConsumer<CountyBloc, CountyState>(
         listener: (context, state) {
           if (state is CountyError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMessage), backgroundColor: appColors.errorColor));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage),
+                backgroundColor: appColors.errorColor,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -54,12 +58,19 @@ class _CountyPageState extends State<CountyPage> {
                       children: [
                         Text(
                           appStrings.lblCountyManagement,
-                          style: boldTextStyle(size: FontSize.s20, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
+                          style: boldTextStyle(
+                            size: FontSize.s20,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.primaryTextColor,
+                          ),
                         ),
                         SizedBox(height: s.s4),
                         Text(
                           'Manage counties across West Virginia',
-                          style: secondaryTextStyle(size: FontSize.s12, color: appColors.secondaryTextColor),
+                          style: secondaryTextStyle(
+                            size: FontSize.s12,
+                            color: appColors.secondaryTextColor,
+                          ),
                         ),
                       ],
                     ),
@@ -69,14 +80,20 @@ class _CountyPageState extends State<CountyPage> {
                       },
                       width: 160,
                       height: 40,
-                      btnWidget: Text('Add New County', style: boldTextStyle(size: FontSize.s14)),
+                      btnWidget: Text(
+                        'Add New County',
+                        style: boldTextStyle(size: FontSize.s14),
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: s.s16),
                 if (state is CountyLoading)
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   )
                 else if (state is CountyLoaded)
                   dataTableWidget(state.counties)
@@ -84,12 +101,18 @@ class _CountyPageState extends State<CountyPage> {
                   Center(
                     child: Padding(
                       padding: EdgeInsets.all(s.s40),
-                      child: Text('Error loading counties: ${state.errorMessage}', style: secondaryTextStyle(color: appColors.errorColor)),
+                      child: Text(
+                        'Error loading counties: ${state.errorMessage}',
+                        style: secondaryTextStyle(color: appColors.errorColor),
+                      ),
                     ),
                   )
                 else
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   ),
               ],
             ),
@@ -108,7 +131,11 @@ class _CountyPageState extends State<CountyPage> {
           (e) => {
             'Sr. No.': (e.key + 1).toString(),
             'County Name': e.value.countyName,
-            'Created At': e.value.createTime == null ? '-' : DateFormat('dd MMM yy hh:mm a').format(e.value.createTime!.toDate()),
+            'Created At': e.value.createTime == null
+                ? '-'
+                : DateFormat(
+                    'dd MMM yy hh:mm a',
+                  ).format(e.value.createTime!.toDate()),
             '_model': e.value,
           },
         )
@@ -117,8 +144,8 @@ class _CountyPageState extends State<CountyPage> {
     return DataTableWidget(
       columns: columns,
       data: data,
-      titleDatatableText: 'All Counties',
-      subTitleDatatableText: 'Manage counties across West Virginia',
+      titleDataTableText: 'All Counties',
+      subTitleDataTableText: 'Manage counties across West Virginia',
       headerColor: appColors.primaryColor,
       headerColumnColor: appColors.textPrimaryColor,
       cellTextColor: appColors.primaryTextColor,
@@ -140,9 +167,19 @@ class _CountyPageState extends State<CountyPage> {
   }
 
   void _onAddCountyTap(BuildContext context) async {
-    final result = await showDialog(context: context, builder: (context) => const AddCountyPage());
-    if (result is Map && result['countyName'] != null && result['countyLowerName'] != null) {
-      context.read<CountyBloc>().add(AddCountyEvent(countyName: result['countyName'], countyLowerName: result['countyLowerName']));
+    final result = await showDialog(
+      context: context,
+      builder: (context) => const AddCountyPage(),
+    );
+    if (result is Map &&
+        result['countyName'] != null &&
+        result['countyLowerName'] != null) {
+      context.read<CountyBloc>().add(
+        AddCountyEvent(
+          countyName: result['countyName'],
+          countyLowerName: result['countyLowerName'],
+        ),
+      );
     }
   }
 
@@ -151,27 +188,37 @@ class _CountyPageState extends State<CountyPage> {
       context: context,
       builder: (context) => AddCountyPage(county: county),
     );
-    if (result is Map && result['countyName'] != null && result['countyLowerName'] != null) {
-      context.read<CountyBloc>().add(UpdateCountyEvent(county: result['county'], countyName: result['countyName'], countyLowerName: result['countyLowerName']));
+    if (result is Map &&
+        result['countyName'] != null &&
+        result['countyLowerName'] != null) {
+      context.read<CountyBloc>().add(
+        UpdateCountyEvent(
+          county: result['county'],
+          countyName: result['countyName'],
+          countyLowerName: result['countyLowerName'],
+        ),
+      );
     }
   }
 
   void _onDeleteCountyTap(BuildContext context, County county) async {
-    final shouldDelete = await AppCustomDialog.show<bool>(
+    await AppCustomDialog.show(
       context: context,
       icon: Icons.delete_outline,
       iconBackgroundColor: appColors.red,
       title: 'Delete County',
-      message: 'Are you sure you want to delete "${county.countyName}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${county.countyName}"? This action cannot be undone.',
       primaryButtonText: 'Delete',
       secondaryButtonText: 'Cancel',
       primaryButtonColor: appColors.red,
-      onPrimaryPressed: () => Navigator.of(context).pop(true),
+      onPrimaryPressed: () {
+        // Navigator.of(context).pop(true);
+        context.read<CountyBloc>().add(
+          DeleteCountyEvent(countyId: county.countyId ?? ''),
+        );
+      },
       onSecondaryPressed: () => Navigator.of(context).pop(false),
     );
-
-    if (shouldDelete == true) {
-      context.read<CountyBloc>().add(DeleteCountyEvent(countyId: county.countyId ?? ''));
-    }
   }
 }

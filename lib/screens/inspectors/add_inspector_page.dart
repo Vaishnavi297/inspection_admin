@@ -5,25 +5,25 @@ import '../../components/app_text_field/app_textfield.dart';
 import '../../components/app_text_style/app_text_style.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
-import '../../data/data_structure/models/inspaction_station.dart';
-import '../../data/repositories/inspaction_station_repository/inspaction_station_repository.dart';
+import '../../data/data_structure/models/inspection_station.dart';
+import '../../data/repositories/inspection_station_repository/inspection_station_repository.dart';
 
-class AddInspactorPage extends StatefulWidget {
+class AddInspectorPage extends StatefulWidget {
   final Map<String, dynamic>? initialData;
-  const AddInspactorPage({super.key, this.initialData});
+  const AddInspectorPage({super.key, this.initialData});
 
   @override
-  State<AddInspactorPage> createState() => _AddInspactorPageState();
+  State<AddInspectorPage> createState() => _AddInspectorPageState();
 }
 
-class _AddInspactorPageState extends State<AddInspactorPage> {
+class _AddInspectorPageState extends State<AddInspectorPage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _badgeController;
-  InspactionStation? _selectedStation;
+  InspectionStation? _selectedStation;
 
   @override
   void initState() {
@@ -83,10 +83,10 @@ class _AddInspactorPageState extends State<AddInspactorPage> {
       ),
       content: Form(
         key: _formKey,
-        child: FutureBuilder<List<InspactionStation>>(
-          future: InspactionStationRepository.instance.getAllStations(),
+        child: FutureBuilder<List<InspectionStation>>(
+          future: InspectionStationRepository.instance.getAllStations(),
           builder: (context, snapshot) {
-            final stations = snapshot.data ?? const <InspactionStation>[];
+            final stations = snapshot.data ?? const <InspectionStation>[];
             if (_selectedStation == null && stations.isNotEmpty) {
               _selectedStation = stations.first;
             }

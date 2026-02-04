@@ -3,40 +3,40 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/data_structure/models/inspector.dart';
 import '../../../data/repositories/inspector_repository/inspector_repository.dart';
 
-part 'inspactor_events.dart';
-part 'inspactor_states.dart';
+part 'inspector_events.dart';
+part 'inspector_state.dart';
 
-class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
+class InspectorBloc extends Bloc<InspectorEvent, InspectorState> {
   final InspectorRepository _repo;
 
-  InspactorBloc()
+  InspectorBloc()
     : _repo = InspectorRepository.instance,
-      super(InspactorInitial()) {
-    on<FetchInspactorsEvent>(_onFetch);
-    on<AddInspactorEvent>(_onAdd);
-    on<UpdateInspactorEvent>(_onUpdate);
-    on<DeleteInspactorEvent>(_onDelete);
+      super(InspectorInitial()) {
+    on<FetchInspectorsEvent>(_onFetch);
+    on<AddInspectorEvent>(_onAdd);
+    on<UpdateInspectorEvent>(_onUpdate);
+    on<DeleteInspectorEvent>(_onDelete);
     on<ToggleActiveEvent>(_onToggleActive);
   }
 
   Future<void> _onFetch(
-    FetchInspactorsEvent event,
-    Emitter<InspactorState> emit,
+    FetchInspectorsEvent event,
+    Emitter<InspectorState> emit,
   ) async {
-    emit(InspactorLoading());
+    emit(InspectorLoading());
     try {
       final list = await _repo.getAllInspectors();
-      emit(InspactorLoaded(list));
+      emit(InspectorLoaded(list));
     } catch (e) {
-      emit(InspactorError(e.toString()));
+      emit(InspectorError(e.toString()));
     }
   }
 
   Future<void> _onAdd(
-    AddInspactorEvent event,
-    Emitter<InspactorState> emit,
+    AddInspectorEvent event,
+    Emitter<InspectorState> emit,
   ) async {
-    emit(InspactorLoading());
+    emit(InspectorLoading());
     try {
       final inspector = Inspector(
         inspectorId: '',
@@ -53,17 +53,17 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
       );
       await _repo.createInspector(inspector);
       final list = await _repo.getAllInspectors();
-      emit(InspactorLoaded(list));
+      emit(InspectorLoaded(list));
     } catch (e) {
-      emit(InspactorError(e.toString()));
+      emit(InspectorError(e.toString()));
     }
   }
 
   Future<void> _onUpdate(
-    UpdateInspactorEvent event,
-    Emitter<InspactorState> emit,
+    UpdateInspectorEvent event,
+    Emitter<InspectorState> emit,
   ) async {
-    emit(InspactorLoading());
+    emit(InspectorLoading());
     try {
       final updated = event.inspector.copyWith(
         firstName: event.firstName,
@@ -77,37 +77,37 @@ class InspactorBloc extends Bloc<InspactorEvent, InspactorState> {
       );
       await _repo.updateInspectorTransaction(updated);
       final list = await _repo.getAllInspectors();
-      emit(InspactorLoaded(list));
+      emit(InspectorLoaded(list));
     } catch (e) {
-      emit(InspactorError(e.toString()));
+      emit(InspectorError(e.toString()));
     }
   }
 
   Future<void> _onDelete(
-    DeleteInspactorEvent event,
-    Emitter<InspactorState> emit,
+    DeleteInspectorEvent event,
+    Emitter<InspectorState> emit,
   ) async {
-    emit(InspactorLoading());
+    emit(InspectorLoading());
     try {
       await _repo.deleteInspectorTransaction(event.inspectorId);
       final list = await _repo.getAllInspectors();
-      emit(InspactorLoaded(list));
+      emit(InspectorLoaded(list));
     } catch (e) {
-      emit(InspactorError(e.toString()));
+      emit(InspectorError(e.toString()));
     }
   }
 
   Future<void> _onToggleActive(
     ToggleActiveEvent event,
-    Emitter<InspactorState> emit,
+    Emitter<InspectorState> emit,
   ) async {
-    emit(InspactorLoading());
+    emit(InspectorLoading());
     try {
       await _repo.toggleActive(event.inspectorId, event.isActive);
       final list = await _repo.getAllInspectors();
-      emit(InspactorLoaded(list));
+      emit(InspectorLoaded(list));
     } catch (e) {
-      emit(InspactorError(e.toString()));
+      emit(InspectorError(e.toString()));
     }
   }
 }

@@ -6,24 +6,24 @@ import 'bloc/working_hours_bloc.dart';
 import '../../components/app_text_field/app_textfield.dart';
 import '../../components/app_button/app_button.dart';
 import '../../components/app_text_style/app_text_style.dart';
-import '../../data/data_structure/models/inspaction_station.dart';
+import '../../data/data_structure/models/inspection_station.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import '../../data/repositories/county_repository/county_repository.dart';
-import '../../data/repositories/inspaction_station_repository/inspaction_station_repository.dart';
+import '../../data/repositories/inspection_station_repository/inspection_station_repository.dart';
 import '../../data/data_structure/models/country.dart';
 import '../../data/services/firebase_service/firebase_authentication_services.dart';
 
-class AddInspactionStationPage extends StatefulWidget {
-  final InspactionStation? station;
-  const AddInspactionStationPage({super.key, this.station});
+class AddInspectionStationPage extends StatefulWidget {
+  final InspectionStation? station;
+  const AddInspectionStationPage({super.key, this.station});
 
   @override
-  State<AddInspactionStationPage> createState() =>
-      _AddInspactionStationPageState();
+  State<AddInspectionStationPage> createState() =>
+      _AddInspectionStationPageState();
 }
 
-class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
+class _AddInspectionStationPageState extends State<AddInspectionStationPage> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _stationIdController = TextEditingController();
@@ -344,7 +344,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
 
       // 3. Duplication Check (Only for Add Mode)
       if (!isUpdate) {
-        final isDuplicate = await InspactionStationRepository.instance
+        final isDuplicate = await InspectionStationRepository.instance
             .isPhoneRegistered(phone);
         if (isDuplicate) {
           Navigator.of(dialogContext).pop();
@@ -409,7 +409,7 @@ class _AddInspactionStationPageState extends State<AddInspactionStationPage> {
       // If Update: Use existing ID. If Add: Use input ID.
       final apiHours = hoursBloc.toWorkingHours();
 
-      InspactionStation station = InspactionStation(
+      InspectionStation station = InspectionStation(
         // Immutable fields
         sId: widget.station?.sId,
         stationId: isUpdate ? widget.station!.stationId : stationId,

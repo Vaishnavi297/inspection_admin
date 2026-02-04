@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inspection_station/data/data_structure/models/inspaction_station.dart';
+import 'package:inspection_station/data/data_structure/models/inspection_station.dart';
 import '../../components/app_button/app_button.dart';
 import '../../components/app_dialog/app_custom_dialog.dart';
 import '../../components/app_text_style/app_text_style.dart';
@@ -9,31 +9,31 @@ import '../../utils/common/data_table/data_table.dart';
 import '../../utils/common/data_table/utils.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
-import '../inspaction_station/bloc/inspaction_station_bloc.dart';
-import 'Inspaction_station_view_page.dart';
-import 'add_inspaction_station_page.dart';
+import 'bloc/inspection_station_bloc.dart';
+import 'Inspection_station_view_page.dart';
+import 'add_inspection_station_page.dart';
 
-class InspactionStationPage extends StatefulWidget {
-  const InspactionStationPage({super.key});
+class InspectionStationPage extends StatefulWidget {
+  const InspectionStationPage({super.key});
 
   @override
-  State<InspactionStationPage> createState() => _InspactionStationPageState();
+  State<InspectionStationPage> createState() => _InspectionStationPageState();
 }
 
-class _InspactionStationPageState extends State<InspactionStationPage> {
+class _InspectionStationPageState extends State<InspectionStationPage> {
   @override
   void initState() {
     super.initState();
-    context.read<InspactionStationBloc>().add(FetchInspactionStationsEvent());
+    context.read<InspectionStationBloc>().add(FetchInspectionStationsEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appColors.backgroundColor,
-      body: BlocConsumer<InspactionStationBloc, InspactionStationState>(
+      body: BlocConsumer<InspectionStationBloc, InspectionStationState>(
         listener: (context, state) {
-          if (state is InspactionStationError) {
+          if (state is InspectionStationError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage),
@@ -55,7 +55,7 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Inspaction Station Management',
+                          'Inspection Station Management',
                           style: boldTextStyle(
                             size: FontSize.s20,
                             fontWeight: FontWeight.w600,
@@ -74,29 +74,29 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
                     ),
                     AppButton(
                       onTap: () {
-                        _onAddInspactionStationTap(context);
+                        _onAddInspectionStationTap(context);
                       },
                       width: 160,
                       height: 40,
                       btnWidget: Text(
-                        'Add New Inspaction Station',
+                        'Add New Inspection Station',
                         style: boldTextStyle(size: FontSize.s14),
                       ),
                     ),
                   ],
                 ),
                 SizedBox(height: s.s16),
-                if (state is InspactionStationLoading)
+                if (state is InspectionStationLoading)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.all(s.s40),
                       child: LoaderView(),
                     ),
                   )
-                else if (state is InspactionStationLoaded)
+                else if (state is InspectionStationLoaded)
                   // Text('${state.inspactionStations.length} stations found')
-                  dataTableWidget(state.inspactionStations)
-                else if (state is InspactionStationError)
+                  dataTableWidget(state.inspectionStations)
+                else if (state is InspectionStationError)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.all(s.s40),
@@ -121,7 +121,7 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
     );
   }
 
-  Widget dataTableWidget(List<InspactionStation> stations) {
+  Widget dataTableWidget(List<InspectionStation> stations) {
     final columns = [
       'Station ID',
       'Station Name',
@@ -186,7 +186,7 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
           hours = '-';
         }
       }
-      final max = station.inspactors ?? 0;
+      final max = station.inspectors ?? 0;
       // final current = 0;
       final inspectors = '$max';
       final active = station.stationActivationStatus == true
@@ -207,8 +207,8 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
     return DataTableWidget(
       columns: columns,
       data: data,
-      titleDatatableText: 'All Stations',
-      subTitleDatatableText: 'List of all inspection stations',
+      titleDataTableText: 'All Stations',
+      subTitleDataTableText: 'List of all inspection stations',
       headerColor: appColors.primaryColor,
       headerColumnColor: appColors.textPrimaryColor,
       cellTextColor: appColors.primaryTextColor,
@@ -218,72 +218,72 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
         RowAction(RowActionType.delete, icon: Icons.delete_outlined),
       },
       onView: (row) {
-        final station = row['_model'] as InspactionStation;
+        final station = row['_model'] as InspectionStation;
         _onViewStationTap(context, station);
       },
       onModify: (row) {
-        final station = row['_model'] as InspactionStation;
-        _onEditInspactionStationTap(context, station);
+        final station = row['_model'] as InspectionStation;
+        _onEditInspectionStationTap(context, station);
       },
       onDelete: (row) {
-        final station = row['_model'] as InspactionStation;
-        _onDeleteInspactionStationTap(context, station);
+        final station = row['_model'] as InspectionStation;
+        _onDeleteInspectionStationTap(context, station);
       },
       actionColumnName: 'Actions',
     );
   }
 
-  void _onViewStationTap(BuildContext context, InspactionStation station) {
+  void _onViewStationTap(BuildContext context, InspectionStation station) {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return InspactionStationViewPage(
+        return InspectionStationViewPage(
           station: station,
-          onDelete: () => _onDeleteInspactionStationTap(context, station),
+          onDelete: () => _onDeleteInspectionStationTap(context, station),
         );
       },
     );
   }
 
-  void _onAddInspactionStationTap(BuildContext context) async {
+  void _onAddInspectionStationTap(BuildContext context) async {
     print('=== MAIN PAGE DEBUG: Opening add station dialog ===');
     final result = await showDialog(
       context: context,
-      builder: (context) => const AddInspactionStationPage(),
+      builder: (context) => const AddInspectionStationPage(),
     );
     print('=== MAIN PAGE DEBUG: Dialog result: $result ===');
     print('=== MAIN PAGE DEBUG: Result type: ${result?.runtimeType} ===');
 
-    if (result is InspactionStation) {
+    if (result is InspectionStation) {
       print('=== MAIN PAGE DEBUG: Adding station: ${result.stationName} ===');
-      context.read<InspactionStationBloc>().add(
-        AddInspactionStationEvent(station: result),
+      context.read<InspectionStationBloc>().add(
+        AddInspectionStationEvent(station: result),
       );
     } else {
       print('=== MAIN PAGE DEBUG: No station returned from dialog ===');
     }
   }
 
-  void _onEditInspactionStationTap(
+  void _onEditInspectionStationTap(
     BuildContext context,
-    InspactionStation station,
+    InspectionStation station,
   ) async {
     final result = await showDialog(
       context: context,
-      builder: (context) => AddInspactionStationPage(station: station),
+      builder: (context) => AddInspectionStationPage(station: station),
     );
-    if (result is InspactionStation) {
-      context.read<InspactionStationBloc>().add(
-        UpdateInspactionStationEvent(station: result),
+    if (result is InspectionStation) {
+      context.read<InspectionStationBloc>().add(
+        UpdateInspectionStationEvent(station: result),
       );
     }
   }
 
-  void _onDeleteInspactionStationTap(
+  void _onDeleteInspectionStationTap(
     BuildContext context,
-    InspactionStation station,
+    InspectionStation station,
   ) async {
-    final shouldDelete = await AppCustomDialog.show<bool>(
+    await AppCustomDialog.show(
       context: context,
       icon: Icons.delete_outline,
       iconBackgroundColor: appColors.red,
@@ -293,16 +293,15 @@ class _InspactionStationPageState extends State<InspactionStationPage> {
       primaryButtonText: 'Delete',
       secondaryButtonText: 'Cancel',
       primaryButtonColor: appColors.red,
-      onPrimaryPressed: () => Navigator.of(context).pop(true),
+      onPrimaryPressed: () {
+        // Navigator.of(context).pop(true);
+        if (station.sId != null && station.sId!.isNotEmpty) {
+          context.read<InspectionStationBloc>().add(
+            DeleteInspectionStationEvent(stationId: station.sId!),
+          );
+        }
+      },
       onSecondaryPressed: () => Navigator.of(context).pop(false),
     );
-
-    if (shouldDelete == true &&
-        station.sId != null &&
-        station.sId!.isNotEmpty) {
-      context.read<InspactionStationBloc>().add(
-        DeleteInspactionStationEvent(stationId: station.sId!),
-      );
-    }
   }
 }

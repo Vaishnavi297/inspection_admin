@@ -124,6 +124,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
                     icon: Icons.fact_check_outlined,
                     index: 6,
                   ),
+                  navItemWidget(title: 'States', icon: Icons.map, index: 7),
                 ],
               ),
             ),
@@ -131,7 +132,7 @@ class _SidebarComponentState extends State<SidebarComponent> {
             navItemWidget(
               title: 'Logout',
               icon: Icons.logout,
-              index: 7,
+              index: 8,
               isTrailingIcon: false,
               color: appColors.errorColor,
             ),
@@ -218,10 +219,10 @@ class _SidebarComponentState extends State<SidebarComponent> {
                     size: s.s18,
                   )
             : null,
-        onTap: index == 7
+        onTap: index == 8
             ? () async {
                 final shouldLogout = await LogoutConfirmationDialog.show(
-                  context: context,
+                  context,
                 );
 
                 if (shouldLogout == true) {
@@ -255,6 +256,9 @@ class _SidebarComponentState extends State<SidebarComponent> {
                     break;
                   case 6:
                     route = AppRoutes.inspections;
+                    break;
+                  case 7:
+                    route = AppRoutes.states;
                     break;
                 }
                 if (GoRouterState.of(context).uri.path != route) {

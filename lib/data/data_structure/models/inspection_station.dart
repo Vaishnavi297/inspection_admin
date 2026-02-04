@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'country.dart';
 
-class InspactionStation {
+class InspectionStation {
   final String? sId;
   final String? stationId;
   final String stationName;
@@ -26,7 +26,7 @@ class InspactionStation {
   final bool? stationAvailabilityStatus;
   final bool? stationDocumentsVerificationStatus;
   final bool? stationActivationStatus;
-  final int? inspactors;
+  final int? inspectors;
 
   // final String? startTime;
   // final String? endTime;
@@ -37,7 +37,7 @@ class InspactionStation {
   final String? stationDescription;
   final WorkingHours? workingHours;
 
-  const InspactionStation({
+  const InspectionStation({
     this.sId,
     this.stationId,
     required this.stationName,
@@ -56,7 +56,7 @@ class InspactionStation {
     this.stationAvailabilityStatus = false,
     this.stationDocumentsVerificationStatus,
     this.stationActivationStatus = false,
-    this.inspactors,
+    this.inspectors,
     // this.startTime,
     // this.endTime,
     this.createTime,
@@ -68,12 +68,12 @@ class InspactionStation {
   /// -----------------------------
   /// From JSON
   /// -----------------------------
-  factory InspactionStation.fromJson(Map<String, dynamic> json) {
+  factory InspectionStation.fromJson(Map<String, dynamic> json) {
     final whRaw = json['working_hours'];
     final WorkingHours? wh = (whRaw is Map)
         ? WorkingHours.fromJson(Map<String, dynamic>.from(whRaw))
         : (whRaw is WorkingHours ? whRaw : null);
-    return InspactionStation(
+    return InspectionStation(
       sId: json['sId'],
       stationId: json['station_id'],
       stationName: json['station_name'] as String,
@@ -105,7 +105,7 @@ class InspactionStation {
       stationDocumentsVerificationStatus:
           json['station_documents_verification_status'],
       stationActivationStatus: json['station_activation_status'],
-      inspactors: json['inspactors'] != null
+      inspectors: json['inspactors'] != null
           ? (json['inspactors'] as num).toInt()
           : 0,
 
@@ -143,9 +143,7 @@ class InspactionStation {
       // 'station_tel_no': stationTelNo,
       'station_address': stationAddress,
       'station_zip_code': stationZipCode,
-      's_county_details': sCountyDetails != null
-          ? sCountyDetails!.toJson()
-          : null,
+      's_county_details': sCountyDetails?.toJson(),
       'station_document_id_list': stationDocumentIdList,
       'station_latitude': stationLatitude,
       'station_longitude': stationLongitude,
@@ -154,7 +152,7 @@ class InspactionStation {
       'station_documents_verification_status':
           stationDocumentsVerificationStatus,
       'station_activation_status': stationActivationStatus,
-      'inspactors': inspactors,
+      'inspactors': inspectors,
       // 'start_time': startTime,
       // 'end_time': endTime,
       'create_time': createTime?.toDate(),
@@ -167,7 +165,7 @@ class InspactionStation {
   /// -----------------------------
   /// copyWith
   /// -----------------------------
-  InspactionStation copyWith({
+  InspectionStation copyWith({
     String? sId,
     String? stationId,
     String? stationName,
@@ -195,7 +193,7 @@ class InspactionStation {
     String? stationDescription,
     WorkingHours? workingHours,
   }) {
-    return InspactionStation(
+    return InspectionStation(
       sId: sId ?? this.sId,
       stationId: stationId ?? this.stationId,
       stationName: stationName ?? this.stationName,
@@ -220,7 +218,7 @@ class InspactionStation {
           this.stationDocumentsVerificationStatus,
       stationActivationStatus:
           stationActivationStatus ?? this.stationActivationStatus,
-      inspactors: inspactors ?? this.inspactors,
+      inspectors: inspactors ?? this.inspectors,
       // startTime: startTime ?? this.startTime,
       // endTime: endTime ?? this.endTime,
       createTime: createTime ?? this.createTime,

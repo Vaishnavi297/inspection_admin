@@ -9,7 +9,7 @@ import 'package:inspection_station/utils/constants/app_dimension.dart';
 
 import '../../constants/app_colors.dart';
 import '../../extensions/context_extension.dart';
-import 'UIDropdownMenu.dart';
+import 'ui_drop_down_menu.dart';
 
 class DataTableWidget extends StatefulWidget {
   final List<String> columns;
@@ -36,12 +36,13 @@ class DataTableWidget extends StatefulWidget {
   final Color? topHeaderColor;
   final bool? isExportBox;
   final bool? isGroupBox;
-  final String? titleDatatableText;
-  final String? subTitleDatatableText;
+  final String? titleDataTableText;
+  final String? subTitleDataTableText;
   final double? maxRowHeight;
   final String? actionColumnName;
   final void Function(Map<String, dynamic>? selectedRow)? onCheckBoxRowSelected;
-  final void Function(Set<Map<String, dynamic>> selectedRows)? onMultiCheckBoxRowSelected;
+  final void Function(Set<Map<String, dynamic>> selectedRows)?
+  onMultiCheckBoxRowSelected;
   final DataTableController? controller;
   final Map<String, FieldType> columnFieldTypes;
   final Map<String, List<UIDropdownMenuItem<String>>> dropdownOptions;
@@ -75,8 +76,8 @@ class DataTableWidget extends StatefulWidget {
     this.isShowLabelIcon = true,
     this.isExportBox = false,
     this.isGroupBox = false,
-    this.titleDatatableText,
-    this.subTitleDatatableText,
+    this.titleDataTableText,
+    this.subTitleDataTableText,
     this.maxRowHeight,
     this.actionColumnName,
     this.onCheckBoxRowSelected,
@@ -162,8 +163,16 @@ class EditableRow {
   final Map<String, FieldType> fieldTypes;
   bool isEditing;
 
-  EditableRow({required this.originalData, required this.fieldTypes, this.isEditing = false})
-    : controllers = {for (var entry in originalData.entries) entry.key: TextEditingController(text: entry.value?.toString() ?? '')};
+  EditableRow({
+    required this.originalData,
+    required this.fieldTypes,
+    this.isEditing = false,
+  }) : controllers = {
+         for (var entry in originalData.entries)
+           entry.key: TextEditingController(
+             text: entry.value?.toString() ?? '',
+           ),
+       };
 
   Map<String, dynamic> get editedData {
     return {for (var entry in controllers.entries) entry.key: entry.value.text};
@@ -197,12 +206,35 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 
   List<Map<String, dynamic>> get _paginatedData {
     final start = _currentPage * _rowsPerPage;
-    return sortedData(widget.data, _searchText, _columnSelections, _sortColumn, _isAscending).skip(start).take(_rowsPerPage).toList();
+    return sortedData(
+      widget.data,
+      _searchText,
+      _columnSelections,
+      _sortColumn,
+      _isAscending,
+    ).skip(start).take(_rowsPerPage).toList();
   }
 
-  int get _totalPages => (sortedData(widget.data, _searchText, _columnSelections, _sortColumn, _isAscending).length / _rowsPerPage).ceil().clamp(1, double.infinity).toInt();
+  int get _totalPages =>
+      (sortedData(
+                widget.data,
+                _searchText,
+                _columnSelections,
+                _sortColumn,
+                _isAscending,
+              ).length /
+              _rowsPerPage)
+          .ceil()
+          .clamp(1, double.infinity)
+          .toInt();
 
-  int get totalDataSearchCount => sortedData(widget.data, _searchText, _columnSelections, _sortColumn, _isAscending).length;
+  int get totalDataSearchCount => sortedData(
+    widget.data,
+    _searchText,
+    _columnSelections,
+    _sortColumn,
+    _isAscending,
+  ).length;
 
   void _onSort(String column) {
     setState(() {
@@ -312,7 +344,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   void _startEditing(int index) {
     final rowData = widget.data[index];
     setState(() {
-      _editableRows[index] = EditableRow(originalData: rowData, fieldTypes: _columnFieldTypes, isEditing: true);
+      _editableRows[index] = EditableRow(
+        originalData: rowData,
+        fieldTypes: _columnFieldTypes,
+        isEditing: true,
+      );
     });
   }
 
@@ -360,16 +396,23 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         _selectedIndices.remove(absoluteIndex);
       }
 
-      _rowSelections = List<bool>.generate(widget.data.length, (i) => _selectedIndices.contains(i));
+      _rowSelections = List<bool>.generate(
+        widget.data.length,
+        (i) => _selectedIndices.contains(i),
+      );
 
-      widget.onMultiCheckBoxRowSelected?.call(_selectedIndices.map((i) => widget.data[i]).toSet());
+      widget.onMultiCheckBoxRowSelected?.call(
+        _selectedIndices.map((i) => widget.data[i]).toSet(),
+      );
     });
   }
 
   void _toggleSelectAll(bool? selected) {
     if (selected == true) {
       setState(() {
-        _selectedIndices = Set<int>.from(Iterable<int>.generate(widget.data.length, (i) => i));
+        _selectedIndices = Set<int>.from(
+          Iterable<int>.generate(widget.data.length, (i) => i),
+        );
         _rowSelections = List<bool>.filled(widget.data.length, true);
         widget.onMultiCheckBoxRowSelected?.call(widget.data.toSet());
       });
@@ -394,8 +437,10 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 
   Widget topBar() {
     double screenWidth = MediaQuery.of(context).size.width;
-    Color blueLight50 = widget.widgetBackgroundColor ?? AppColors().surfaceColor;
-    bool hasGroupDropdown = widget.isGroupBox == true && widget.groupFilterColumn == null;
+    Color blueLight50 =
+        widget.widgetBackgroundColor ?? AppColors().surfaceColor;
+    bool hasGroupDropdown =
+        widget.isGroupBox == true && widget.groupFilterColumn == null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
@@ -405,15 +450,34 @@ class _DataTableWidgetState extends State<DataTableWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(width: screenWidth > 1024 ? 320 : 280, child: _buildModernSearchBox(blueLight50)),
-                if (widget.uploadExcelData != null && widget.isShowLabelIcon == true) ...[const SizedBox(width: 12), addLabelBox(blueLight50)],
+                SizedBox(
+                  width: screenWidth > 1024 ? 320 : 280,
+                  child: _buildModernSearchBox(blueLight50),
+                ),
+                if (widget.uploadExcelData != null &&
+                    widget.isShowLabelIcon == true) ...[
+                  const SizedBox(width: 12),
+                  addLabelBox(blueLight50),
+                ],
                 const SizedBox(width: 12),
                 columnBox(blueLight50),
                 const SizedBox(width: 12),
                 filterToggleBox(blueLight50),
-                if (hasGroupDropdown) ...[const SizedBox(width: 12), SizedBox(width: screenWidth * 0.15, child: groupBox(blueLight50))],
-                if (widget.uploadExcelData != null) ...[const SizedBox(width: 12), uploadBox(blueLight50)],
-                if (widget.isExportBox == true) ...[const SizedBox(width: 12), exportBox(blueLight50)],
+                if (hasGroupDropdown) ...[
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: screenWidth * 0.15,
+                    child: groupBox(blueLight50),
+                  ),
+                ],
+                if (widget.uploadExcelData != null) ...[
+                  const SizedBox(width: 12),
+                  uploadBox(blueLight50),
+                ],
+                if (widget.isExportBox == true) ...[
+                  const SizedBox(width: 12),
+                  exportBox(blueLight50),
+                ],
               ],
             )
           : Column(
@@ -425,13 +489,26 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    if (widget.uploadExcelData != null && widget.isShowLabelIcon == true) ...[addLabelBox(blueLight50), const SizedBox(width: 10)],
+                    if (widget.uploadExcelData != null &&
+                        widget.isShowLabelIcon == true) ...[
+                      addLabelBox(blueLight50),
+                      const SizedBox(width: 10),
+                    ],
                     columnBox(blueLight50),
                     const SizedBox(width: 10),
                     filterToggleBox(blueLight50),
-                    if (hasGroupDropdown) ...[const SizedBox(width: 10), Expanded(child: groupBox(blueLight50))],
-                    if (widget.uploadExcelData != null) ...[const SizedBox(width: 10), uploadBox(blueLight50)],
-                    if (widget.isExportBox == true) ...[const SizedBox(width: 10), exportBox(blueLight50)],
+                    if (hasGroupDropdown) ...[
+                      const SizedBox(width: 10),
+                      Expanded(child: groupBox(blueLight50)),
+                    ],
+                    if (widget.uploadExcelData != null) ...[
+                      const SizedBox(width: 10),
+                      uploadBox(blueLight50),
+                    ],
+                    if (widget.isExportBox == true) ...[
+                      const SizedBox(width: 10),
+                      exportBox(blueLight50),
+                    ],
                   ],
                 ),
               ],
@@ -500,7 +577,14 @@ class _DataTableWidgetState extends State<DataTableWidget> {
           children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [_buildPerPageButton(screenWidth), const SizedBox(width: 12), _buildDropDownPerPage(screenWidth)]),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildPerPageButton(screenWidth),
+                  const SizedBox(width: 12),
+                  _buildDropDownPerPage(screenWidth),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             _buildTextPerPage(screenWidth),
@@ -539,7 +623,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
       return SizedBox(
         child: Text(
           "Showing 0 to 0 of 0 entries",
-          style: context.theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400, fontSize: 14, color: AppColors().surfaceColor.withOpacity(0.7)),
+          style: context.theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+            color: AppColors().surfaceColor.withOpacity(0.7),
+          ),
         ),
       );
     }
@@ -550,7 +638,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     return SizedBox(
       child: Text(
         "Showing $start to $end of $totalCount entries",
-        style: context.theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400, fontSize: 14, color: AppColors().surfaceColor.withOpacity(0.7)),
+        style: context.theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
+          color: AppColors().surfaceColor.withOpacity(0.7),
+        ),
       ),
     );
   }
@@ -591,12 +683,20 @@ class _DataTableWidgetState extends State<DataTableWidget> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: _currentPage > 0 ? Colors.white : Colors.white.withOpacity(0.5),
+              color: _currentPage > 0
+                  ? Colors.white
+                  : Colors.white.withOpacity(0.5),
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
             ),
             alignment: Alignment.center,
-            child: Icon(Icons.chevron_left, size: 18, color: _currentPage > 0 ? const Color(0xFF1F2937) : const Color(0xFF1F2937).withOpacity(0.3)),
+            child: Icon(
+              Icons.chevron_left,
+              size: 18,
+              color: _currentPage > 0
+                  ? const Color(0xFF1F2937)
+                  : const Color(0xFF1F2937).withOpacity(0.3),
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -620,7 +720,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 alignment: Alignment.center,
                 child: Text(
                   '${pageIndex + 1}',
-                  style: context.theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, fontSize: 14, color: isActive ? Colors.white : const Color(0xFF1F2937)),
+                  style: context.theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    color: isActive ? Colors.white : const Color(0xFF1F2937),
+                  ),
                 ),
               ),
             ),
@@ -629,7 +733,13 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         // Ellipsis if needed
         if (endPage < _totalPages && _totalPages > maxVisible) ...[
           const SizedBox(width: 4),
-          Text('...', style: context.theme.textTheme.bodyMedium?.copyWith(fontSize: 14, color: const Color(0xFF1F2937).withOpacity(0.5))),
+          Text(
+            '...',
+            style: context.theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 14,
+              color: const Color(0xFF1F2937).withOpacity(0.5),
+            ),
+          ),
           const SizedBox(width: 4),
           InkWell(
             onTap: () => setState(() => _currentPage = _totalPages - 1),
@@ -640,7 +750,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
               alignment: Alignment.center,
               child: Text(
                 '$_totalPages',
-                style: context.theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, fontSize: 14, color: const Color(0xFF1F2937)),
+                style: context.theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: const Color(0xFF1F2937),
+                ),
               ),
             ),
           ),
@@ -648,18 +762,28 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         const SizedBox(width: 8),
         // Next button - circular with arrow icon only
         InkWell(
-          onTap: (_currentPage + 1) < _totalPages ? () => setState(() => _currentPage++) : null,
+          onTap: (_currentPage + 1) < _totalPages
+              ? () => setState(() => _currentPage++)
+              : null,
           borderRadius: BorderRadius.circular(20),
           child: Container(
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: (_currentPage + 1) < _totalPages ? Colors.white : Colors.white.withOpacity(0.5),
+              color: (_currentPage + 1) < _totalPages
+                  ? Colors.white
+                  : Colors.white.withOpacity(0.5),
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
             ),
             alignment: Alignment.center,
-            child: Icon(Icons.chevron_right, size: 18, color: (_currentPage + 1) < _totalPages ? const Color(0xFF1F2937) : const Color(0xFF1F2937).withOpacity(0.3)),
+            child: Icon(
+              Icons.chevron_right,
+              size: 18,
+              color: (_currentPage + 1) < _totalPages
+                  ? const Color(0xFF1F2937)
+                  : const Color(0xFF1F2937).withOpacity(0.3),
+            ),
           ),
         ),
       ],
@@ -697,7 +821,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   Widget build(BuildContext context) {
     int? sortColumnIndex;
     if (_sortColumn != null) {
-      final filteredColumns = _columnOrder.where((col) => _visibleColumns.contains(col)).toList();
+      final filteredColumns = _columnOrder
+          .where((col) => _visibleColumns.contains(col))
+          .toList();
       sortColumnIndex = filteredColumns.indexOf(_sortColumn!);
       if (sortColumnIndex == -1) {
         sortColumnIndex = null;
@@ -712,7 +838,10 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     }
 
     return Container(
-      decoration: BoxDecoration(color: widget.backgroundCardColor ?? Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: widget.backgroundCardColor ?? Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -726,7 +855,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width * (_visibleColumns.length < 6 ? 0.8 : 1.0)),
+                  constraints: BoxConstraints(
+                    minWidth:
+                        MediaQuery.of(context).size.width *
+                        (_visibleColumns.length < 6 ? 0.8 : 1.0),
+                  ),
                   child: DataTable(
                     showCheckboxColumn: false,
                     dividerThickness: 0.02,
@@ -735,13 +868,17 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                     sortAscending: _isAscending,
                     sortColumnIndex: sortColumnIndex,
                     columns: [
-                      if (MediaQuery.of(context).size.width < 450) const DataColumn(label: SizedBox.shrink()),
-                      if (widget.onCheckBoxRowSelected != null || widget.onMultiCheckBoxRowSelected != null) ...{
+                      if (MediaQuery.of(context).size.width < 450)
+                        const DataColumn(label: SizedBox.shrink()),
+                      if (widget.onCheckBoxRowSelected != null ||
+                          widget.onMultiCheckBoxRowSelected != null) ...{
                         DataColumn(
                           label: _isMultiSelectMode
                               ? Checkbox(
                                   tristate: true,
-                                  value: _selectedIndices.length == widget.data.length
+                                  value:
+                                      _selectedIndices.length ==
+                                          widget.data.length
                                       ? true
                                       : _selectedIndices.isEmpty
                                       ? false
@@ -751,77 +888,138 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                               : const SizedBox.shrink(),
                         ),
                       },
-                      ..._columnOrder.where((col) => _visibleColumns.contains(col)).map((col) {
-                        int colIndex = _columnOrder.indexOf(col);
-                        final uniqueValues = widget.data.map((e) => e[col]?.toString() ?? '').toSet().toList();
-                        _columnSelections[col] ??= uniqueValues.toSet();
-                        final isFilterable = widget.filterableColumns == null || widget.filterableColumns!.contains(col);
-                        return DataColumn(
-                          label: DragTarget<String>(
-                            onWillAccept: (draggedCol) => draggedCol != col,
-                            onAccept: (draggedCol) {
-                              setState(() {
-                                int fromIndex = _columnOrder.indexOf(draggedCol);
-                                _columnOrder.removeAt(fromIndex);
-                                _columnOrder.insert(colIndex, draggedCol);
-                              });
-                            },
-                            builder: (context, candidateData, rejectedData) => LongPressDraggable<String>(
-                              data: col,
-                              feedback: Material(
-                                elevation: 4,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  color: widget.headerColor ?? Theme.of(context).colorScheme.surfaceContainerLow,
-                                  child: Text(
-                                    col,
-                                    style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 14, color: Color(0XFF221340)),
-                                  ),
-                                ),
-                              ),
-                              child: InkWell(
-                                onTap: () => _onSort(col),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      col,
-                                      style: context.theme.textTheme.titleLarge?.copyWith(
-                                        color: widget.headerColumnColor ?? const Color(0xFF6E6D74), // 6B7280
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 12,
+                      ..._columnOrder
+                          .where((col) => _visibleColumns.contains(col))
+                          .map((col) {
+                            int colIndex = _columnOrder.indexOf(col);
+                            final uniqueValues = widget.data
+                                .map((e) => e[col]?.toString() ?? '')
+                                .toSet()
+                                .toList();
+                            _columnSelections[col] ??= uniqueValues.toSet();
+                            final isFilterable =
+                                widget.filterableColumns == null ||
+                                widget.filterableColumns!.contains(col);
+                            return DataColumn(
+                              label: DragTarget<String>(
+                                onWillAccept: (draggedCol) => draggedCol != col,
+                                onAccept: (draggedCol) {
+                                  setState(() {
+                                    int fromIndex = _columnOrder.indexOf(
+                                      draggedCol,
+                                    );
+                                    _columnOrder.removeAt(fromIndex);
+                                    _columnOrder.insert(colIndex, draggedCol);
+                                  });
+                                },
+                                builder:
+                                    (
+                                      context,
+                                      candidateData,
+                                      rejectedData,
+                                    ) => LongPressDraggable<String>(
+                                      data: col,
+                                      feedback: Material(
+                                        elevation: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          color:
+                                              widget.headerColor ??
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.surfaceContainerLow,
+                                          child: Text(
+                                            col,
+                                            style: context
+                                                .theme
+                                                .textTheme
+                                                .titleLarge
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 14,
+                                                  color: Color(0XFF221340),
+                                                ),
+                                          ),
+                                        ),
                                       ),
-                                      overflow: TextOverflow.ellipsis,
+                                      child: InkWell(
+                                        onTap: () => _onSort(col),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              col,
+                                              style: context
+                                                  .theme
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                    color:
+                                                        widget
+                                                            .headerColumnColor ??
+                                                        const Color(
+                                                          0xFF6E6D74,
+                                                        ), // 6B7280
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 12,
+                                                  ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            if (isFilterable &&
+                                                _showFilterOptions)
+                                              _FilterDropdownWithImage(
+                                                color:
+                                                    widget
+                                                        .widgetBackgroundColor ??
+                                                    AppColors().white,
+                                                column: col,
+                                                options: uniqueValues,
+                                                selections:
+                                                    _columnSelections[col]!,
+                                                onChanged: (column, selected) {
+                                                  setState(() {
+                                                    _columnSelections[column] =
+                                                        selected;
+                                                    _currentPage = 0;
+                                                  });
+                                                },
+                                                optionTextStyle: context
+                                                    .textTheme
+                                                    .labelMedium
+                                                    ?.copyWith(
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.onSurface,
+                                                    ),
+                                                controller: widget.controller,
+                                              ),
+                                            if (_sortColumn == col)
+                                              Icon(
+                                                _isAscending
+                                                    ? Icons.arrow_upward
+                                                    : Icons.arrow_downward,
+                                                size: 16,
+                                                color: const Color(0xFF6B7280),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                    const SizedBox(width: 4),
-                                    if (isFilterable && _showFilterOptions)
-                                      _FilterDropdownWithImage(
-                                        color: widget.widgetBackgroundColor ?? AppColors().white,
-                                        column: col,
-                                        options: uniqueValues,
-                                        selections: _columnSelections[col]!,
-                                        onChanged: (column, selected) {
-                                          setState(() {
-                                            _columnSelections[column] = selected;
-                                            _currentPage = 0;
-                                          });
-                                        },
-                                        optionTextStyle: context.textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
-                                        controller: widget.controller,
-                                      ),
-                                    if (_sortColumn == col) Icon(_isAscending ? Icons.arrow_upward : Icons.arrow_downward, size: 16, color: const Color(0xFF6B7280)),
-                                  ],
-                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      if (widget.rowActions != null && widget.rowActions!.isNotEmpty)
+                            );
+                          })
+                          .toList(),
+                      if (widget.rowActions != null &&
+                          widget.rowActions!.isNotEmpty)
                         DataColumn(
                           label: Text(
                             widget.actionColumnName ?? 'Actions',
                             style: context.theme.textTheme.titleLarge?.copyWith(
-                              color: widget.headerColumnColor ?? const Color(0xFF6E6D74), // #6E6D74, 0xFF6B7280
+                              color:
+                                  widget.headerColumnColor ??
+                                  const Color(
+                                    0xFF6E6D74,
+                                  ), // #6E6D74, 0xFF6B7280
                               fontWeight: FontWeight.w500,
                               fontSize: 12,
                             ),
@@ -830,9 +1028,14 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                     ],
                     border: const TableBorder(
                       bottom: BorderSide(color: Color(0xFFE7E7E8), width: 0.5),
-                      horizontalInside: BorderSide(color: Color(0xFFE7E7E8), width: 0.5),
+                      horizontalInside: BorderSide(
+                        color: Color(0xFFE7E7E8),
+                        width: 0.5,
+                      ),
                     ),
-                    headingRowColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                    headingRowColor: WidgetStateProperty.resolveWith<Color?>((
+                      Set<WidgetState> states,
+                    ) {
                       return widget.headerColor ?? Colors.white;
                     }),
                     rows: groupedDataRows(
@@ -851,7 +1054,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                       _visibleColumns,
                       widget.cellTextColor,
                       _rowSelections,
-                      _isMultiSelectMode ? _handleMultiSelect : (widget.onCheckBoxRowSelected == null ? null : _handleSingleSelect),
+                      _isMultiSelectMode
+                          ? _handleMultiSelect
+                          : (widget.onCheckBoxRowSelected == null
+                                ? null
+                                : _handleSingleSelect),
                       _currentPage,
                       _rowsPerPage,
                       _editableRows,
@@ -886,7 +1093,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                   Text(
                     'No records found',
                     textAlign: TextAlign.center,
-                    style: context.theme.textTheme.titleLarge?.copyWith(color: widget.cellTextColor ?? const Color(0xFF6B7280), fontWeight: FontWeight.w400, fontSize: 14),
+                    style: context.theme.textTheme.titleLarge?.copyWith(
+                      color: widget.cellTextColor ?? const Color(0xFF6B7280),
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -947,7 +1158,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   /// Normal interactive Group By dropdown (used only when [groupFilterColumn] is null)
   Widget groupBox(Color? blueLight50) {
     return DropdownButtonFormField<String>(
-      style: context.textTheme.labelMedium?.copyWith(color: blueLight50 ?? context.theme.highlightColor),
+      style: context.textTheme.labelMedium?.copyWith(
+        color: blueLight50 ?? context.theme.highlightColor,
+      ),
       value: null,
       isDense: true,
       isExpanded: true,
@@ -962,8 +1175,13 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 ? groupByColumns!.first
                 : groupByColumns!.join(', '),
             style: groupByColumns?.isEmpty ?? true
-                ? context.textTheme.labelSmall?.copyWith(fontSize: 14, fontWeight: FontWeight.w500)
-                : context.textTheme.labelMedium?.copyWith(color: AppColors().surfaceColor),
+                ? context.textTheme.labelSmall?.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  )
+                : context.textTheme.labelMedium?.copyWith(
+                    color: AppColors().surfaceColor,
+                  ),
           ),
         ),
       ),
@@ -972,15 +1190,22 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         filled: true,
         fillColor: blueLight50 ?? context.theme.highlightColor,
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.onPrimaryContainer),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.onPrimaryContainer),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.onPrimaryContainer, width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            width: 2,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
       ),
@@ -990,14 +1215,21 @@ class _DataTableWidgetState extends State<DataTableWidget> {
           enabled: false,
           child: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              if (_tempSelectedColumns.isEmpty && groupByColumns != null && groupByColumns!.isNotEmpty) {
+              if (_tempSelectedColumns.isEmpty &&
+                  groupByColumns != null &&
+                  groupByColumns!.isNotEmpty) {
                 _tempSelectedColumns = Set.from(groupByColumns!);
               }
               return Column(
                 children: [
                   ...widget.columns.map((col) {
                     return CheckboxListTile(
-                      title: Text(col, style: context.textTheme.labelMedium?.copyWith(color: AppColors().surfaceColor)),
+                      title: Text(
+                        col,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: AppColors().surfaceColor,
+                        ),
+                      ),
                       value: _tempSelectedColumns.contains(col),
                       onChanged: (bool? value) {
                         setState(() {
@@ -1018,7 +1250,10 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                   SizedBox(height: 10),
                   const Divider(height: 1),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -1042,7 +1277,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                             Navigator.pop(context);
                             if (mounted) {
                               this.setState(() {
-                                groupByColumns = _tempSelectedColumns.isNotEmpty ? _tempSelectedColumns.toList() : null;
+                                groupByColumns = _tempSelectedColumns.isNotEmpty
+                                    ? _tempSelectedColumns.toList()
+                                    : null;
                                 _currentPage = 0;
                               });
                             }
@@ -1082,7 +1319,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         },
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(Icons.view_column_outlined, size: 20, color: Color(0xFF6B7280)),
+          child: Icon(
+            Icons.view_column_outlined,
+            size: 20,
+            color: Color(0xFF6B7280),
+          ),
         ),
       ),
     );
@@ -1103,19 +1344,32 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         },
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(_showFilterOptions ? Icons.filter_list : Icons.filter_list_off, size: 20, color: _showFilterOptions ? Color(0xFF221340) : Color(0xFF6B7280)),
+          child: Icon(
+            _showFilterOptions ? Icons.filter_list : Icons.filter_list_off,
+            size: 20,
+            color: _showFilterOptions ? Color(0xFF221340) : Color(0xFF6B7280),
+          ),
         ),
       ),
     );
   }
 
-  void _showColumnPopupMenu(BuildContext context, Offset position, Color cardColor) {
+  void _showColumnPopupMenu(
+    BuildContext context,
+    Offset position,
+    Color cardColor,
+  ) {
     final tempVisibleColumns = Set<String>.from(_visibleColumns);
 
     showMenu(
       color: cardColor,
       context: context,
-      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx,
+        position.dy,
+      ),
       items: [
         PopupMenuItem(
           enabled: false,
@@ -1133,7 +1387,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                             value: tempVisibleColumns.contains(col),
                             onChanged: (bool? value) {
                               setState(() {
-                                value == true ? tempVisibleColumns.add(col) : tempVisibleColumns.remove(col);
+                                value == true
+                                    ? tempVisibleColumns.add(col)
+                                    : tempVisibleColumns.remove(col);
                               });
                             },
                           ),
@@ -1190,11 +1446,21 @@ class _DataTableWidgetState extends State<DataTableWidget> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset(exportCurved, width: 20, height: 20, fit: BoxFit.contain, color: Colors.white),
+          SvgPicture.asset(
+            exportCurved,
+            width: 20,
+            height: 20,
+            fit: BoxFit.contain,
+            color: Colors.white,
+          ),
           const SizedBox(width: 8),
           Text(
             'Export',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -1212,11 +1478,21 @@ class _DataTableWidgetState extends State<DataTableWidget> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(importCurved, width: 20, height: 20, fit: BoxFit.contain, color: Colors.white),
+          Image.asset(
+            importCurved,
+            width: 20,
+            height: 20,
+            fit: BoxFit.contain,
+            color: Colors.white,
+          ),
           const SizedBox(width: 8),
           const Text(
             'Upload',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -1230,7 +1506,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
       padding: EdgeInsets.zero,
       cardColor: blueLight50,
       borderColor: Theme.of(context).colorScheme.onPrimaryContainer,
-      child: IconButton(icon: Icon(Icons.add), tooltip: 'Add Label', onPressed: widget.onAddLabel),
+      child: IconButton(
+        icon: Icon(Icons.add),
+        tooltip: 'Add Label',
+        onPressed: widget.onAddLabel,
+      ),
     );
   }
 }
@@ -1245,10 +1525,19 @@ class _FilterDropdownWithImage extends StatefulWidget {
   final TextStyle? optionTextStyle;
   final DataTableController? controller;
 
-  const _FilterDropdownWithImage({required this.column, required this.selections, required this.options, required this.onChanged, this.color, this.optionTextStyle, this.controller});
+  const _FilterDropdownWithImage({
+    required this.column,
+    required this.selections,
+    required this.options,
+    required this.onChanged,
+    this.color,
+    this.optionTextStyle,
+    this.controller,
+  });
 
   @override
-  State<_FilterDropdownWithImage> createState() => _FilterDropdownWithImageState();
+  State<_FilterDropdownWithImage> createState() =>
+      _FilterDropdownWithImageState();
 }
 
 class _FilterDropdownWithImageState extends State<_FilterDropdownWithImage> {
@@ -1312,7 +1601,13 @@ class _FilterDropdownWithImageState extends State<_FilterDropdownWithImage> {
                       TextButton(
                         onPressed: () {
                           setInnerState(() {
-                            final filteredOptions = widget.options.where((option) => option.toLowerCase().contains(_searchController.text.toLowerCase())).toSet();
+                            final filteredOptions = widget.options
+                                .where(
+                                  (option) => option.toLowerCase().contains(
+                                    _searchController.text.toLowerCase(),
+                                  ),
+                                )
+                                .toSet();
                             selected.addAll(filteredOptions);
                           });
                           widget.onChanged(widget.column, selected);
@@ -1326,12 +1621,18 @@ class _FilterDropdownWithImageState extends State<_FilterDropdownWithImage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: TextField(
-                      style: context.textTheme.labelSmall?.copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+                      style: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                       controller: _searchController,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.search, color: (Colors.black)),
                         hintText: 'Search',
-                        hintStyle: context.textTheme.labelSmall?.copyWith(fontSize: 12, fontWeight: FontWeight.w500),
+                        hintStyle: context.textTheme.labelSmall?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0xFFE2E8F0)),
                           borderRadius: BorderRadius.circular(8),
@@ -1341,7 +1642,10 @@ class _FilterDropdownWithImageState extends State<_FilterDropdownWithImage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFFE2E8F0), width: 2),
+                          borderSide: BorderSide(
+                            color: Color(0xFFE2E8F0),
+                            width: 2,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         isDense: true,
@@ -1363,24 +1667,34 @@ class _FilterDropdownWithImageState extends State<_FilterDropdownWithImage> {
                       child: ListView(
                         controller: _scrollController,
                         shrinkWrap: true,
-                        children: widget.options.where((option) => option.toLowerCase().contains(_searchController.text.toLowerCase())).map((option) {
-                          return CheckboxListTile(
-                            title: Text(option, style: widget.optionTextStyle),
-                            value: selected.contains(option),
-                            dense: true,
-                            visualDensity: VisualDensity.compact,
-                            onChanged: (val) {
-                              setInnerState(() {
-                                if (val == true) {
-                                  selected.add(option);
-                                } else {
-                                  selected.remove(option);
-                                }
-                              });
-                              widget.onChanged(widget.column, selected);
-                            },
-                          );
-                        }).toList(),
+                        children: widget.options
+                            .where(
+                              (option) => option.toLowerCase().contains(
+                                _searchController.text.toLowerCase(),
+                              ),
+                            )
+                            .map((option) {
+                              return CheckboxListTile(
+                                title: Text(
+                                  option,
+                                  style: widget.optionTextStyle,
+                                ),
+                                value: selected.contains(option),
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                onChanged: (val) {
+                                  setInnerState(() {
+                                    if (val == true) {
+                                      selected.add(option);
+                                    } else {
+                                      selected.remove(option);
+                                    }
+                                  });
+                                  widget.onChanged(widget.column, selected);
+                                },
+                              );
+                            })
+                            .toList(),
                       ),
                     ),
                   ),

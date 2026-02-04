@@ -4,22 +4,23 @@ import 'package:go_router/go_router.dart';
 
 import '../../screens/auth/login_page.dart';
 import '../../screens/home/main_layout.dart';
+import '../../screens/inspectors/bloc/inspector_bloc.dart';
+import '../../screens/inspectors/inspector_page.dart';
 import '../../screens/splash/splash_page.dart';
 import '../../screens/auth/bloc/sign_in_bloc.dart';
 
 import '../../screens/dashboard/dashboard_page.dart';
 import '../../screens/county/county_page.dart';
 import '../../screens/county/bloc/county_bloc.dart';
-import '../../screens/inspaction_station/Inspaction_station_page.dart';
-import '../../screens/inspaction_station/bloc/inspaction_station_bloc.dart';
-import '../../screens/inspactors/inspactor_page.dart';
-import '../../screens/inspactors/bloc/inspactor_bloc.dart';
+import '../../screens/inspection_station/Inspection_station_page.dart';
+import '../../screens/inspection_station/bloc/inspection_station_bloc.dart';
 import '../../screens/users/users_page.dart';
 import '../../screens/users/bloc/users_bloc.dart';
 import '../../screens/vehicles/vehicles_page.dart';
 import '../../screens/vehicles/bloc/vehicles_bloc.dart';
 import '../../screens/inspections/inspection_page.dart';
 import '../../screens/inspections/bloc/inspection_bloc.dart';
+import '../../screens/states/state_list_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -31,6 +32,7 @@ class AppRoutes {
   static const String users = '/users';
   static const String vehicles = '/vehicles';
   static const String inspections = '/inspections';
+  static const String states = '/states';
 
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
       GlobalKey<NavigatorState>();
@@ -66,6 +68,8 @@ class AppRoutes {
             index = 5;
           else if (location == AppRoutes.inspections)
             index = 6;
+          else if (location == AppRoutes.states)
+            index = 7;
 
           return MainLayout(currentIndex: index, child: child);
         },
@@ -84,15 +88,15 @@ class AppRoutes {
           GoRoute(
             path: stations,
             builder: (context, state) => BlocProvider(
-              create: (context) => InspactionStationBloc(),
-              child: const InspactionStationPage(),
+              create: (context) => InspectionStationBloc(),
+              child: const InspectionStationPage(),
             ),
           ),
           GoRoute(
             path: inspectors,
             builder: (context, state) => BlocProvider(
-              create: (context) => InspactorBloc(),
-              child: const InspactorsPage(),
+              create: (context) => InspectorBloc(),
+              child: const InspectorPage(),
             ),
           ),
           GoRoute(
@@ -115,6 +119,10 @@ class AppRoutes {
               create: (context) => InspectionBloc(),
               child: const InspectionPage(),
             ),
+          ),
+          GoRoute(
+            path: states,
+            builder: (context, state) => const StateListPage(),
           ),
         ],
       ),

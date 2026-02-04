@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:inspection_station/utils/constants/app_colors.dart';
 
 import '../../../components/app_text_field/app_textfield.dart';
-import 'UIDropdownMenu.dart';
+import 'ui_drop_down_menu.dart';
 import 'data_table.dart';
 
 enum RowActionType { modify, delete, view, execute, inlineEdit, add, renew }
@@ -628,7 +628,7 @@ List<DataRow> groupedDataRows(
       ];
 
       if (hasCheckboxes) {
-        mainCells.add(DataCell(Checkbox(value: isSelected, onChanged: (selected) => onRowSelected?.call(pageRelativeIndex, selected))));
+        mainCells.add(DataCell(Checkbox(value: isSelected, onChanged: (selected) => onRowSelected.call(pageRelativeIndex, selected))));
       }
 
       mainCells.addAll(

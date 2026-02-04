@@ -1,15 +1,16 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:inspection_station/data/data_structure/models/inspaction_station.dart';
+import 'package:inspection_station/data/data_structure/models/inspection_station.dart';
 import '../../components/app_button/app_button.dart';
 import '../../components/app_text_style/app_text_style.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/constants/app_dimension.dart';
 
-class InspactionStationViewPage extends StatelessWidget {
-  final InspactionStation station;
+class InspectionStationViewPage extends StatelessWidget {
+  final InspectionStation station;
   final Function() onDelete;
-  const InspactionStationViewPage({
+  const InspectionStationViewPage({
     super.key,
     required this.station,
     required this.onDelete,
@@ -292,7 +293,7 @@ class InspactionStationViewPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${station.inspactors}',
+                          '${station.inspectors}',
                           style: boldTextStyle(size: FontSize.s20),
                         ),
                         SizedBox(height: s.s4),

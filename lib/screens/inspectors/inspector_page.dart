@@ -9,32 +9,37 @@ import '../../utils/common/data_table/utils.dart';
 import '../../utils/constants/app_colors.dart';
 import '../../utils/constants/app_dimension.dart';
 import '../../data/data_structure/models/inspector.dart';
-import 'bloc/inspactor_bloc.dart';
-import 'inspactor_view_page.dart';
-import 'add_inspactor_page.dart';
+import 'bloc/inspector_bloc.dart';
+import 'inspector_view_page.dart';
+import 'add_inspector_page.dart';
 
-class InspactorsPage extends StatefulWidget {
-  const InspactorsPage({super.key});
+class InspectorPage extends StatefulWidget {
+  const InspectorPage({super.key});
 
   @override
-  State<InspactorsPage> createState() => _InspactorsPageState();
+  State<InspectorPage> createState() => _InspectorPageState();
 }
 
-class _InspactorsPageState extends State<InspactorsPage> {
+class _InspectorPageState extends State<InspectorPage> {
   @override
   void initState() {
     super.initState();
-    context.read<InspactorBloc>().add(FetchInspactorsEvent());
+    context.read<InspectorBloc>().add(FetchInspectorsEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appColors.backgroundColor,
-      body: BlocConsumer<InspactorBloc, InspactorState>(
+      body: BlocConsumer<InspectorBloc, InspectorState>(
         listener: (context, state) {
-          if (state is InspactorError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: appColors.errorColor));
+          if (state is InspectorError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: appColors.errorColor,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -51,12 +56,19 @@ class _InspactorsPageState extends State<InspactorsPage> {
                       children: [
                         Text(
                           'All Inspectors',
-                          style: boldTextStyle(size: FontSize.s20, fontWeight: FontWeight.w600, color: appColors.primaryTextColor),
+                          style: boldTextStyle(
+                            size: FontSize.s20,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.primaryTextColor,
+                          ),
                         ),
                         SizedBox(height: s.s4),
                         Text(
                           'List of all inspectors with their assignments',
-                          style: secondaryTextStyle(size: FontSize.s12, color: appColors.secondaryTextColor),
+                          style: secondaryTextStyle(
+                            size: FontSize.s12,
+                            color: appColors.secondaryTextColor,
+                          ),
                         ),
                       ],
                     ),
@@ -64,20 +76,29 @@ class _InspactorsPageState extends State<InspactorsPage> {
                       onTap: () => _onAddInspactorTap(),
                       width: 180,
                       height: 40,
-                      btnWidget: Text('Add New Inspector', style: boldTextStyle(size: FontSize.s14)),
+                      btnWidget: Text(
+                        'Add New Inspector',
+                        style: boldTextStyle(size: FontSize.s14),
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: s.s16),
-                if (state is InspactorLoading)
+                if (state is InspectorLoading)
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   )
-                else if (state is InspactorLoaded)
-                  _dataTableWidget(state.inspactors)
+                else if (state is InspectorLoaded)
+                  _dataTableWidget(state.inspectors)
                 else
                   Center(
-                    child: Padding(padding: EdgeInsets.all(s.s40), child: LoaderView()),
+                    child: Padding(
+                      padding: EdgeInsets.all(s.s40),
+                      child: LoaderView(),
+                    ),
                   ),
               ],
             ),
@@ -88,7 +109,15 @@ class _InspactorsPageState extends State<InspactorsPage> {
   }
 
   Widget _dataTableWidget(List<Inspector> inspactors) {
-    final columns = ['Sr. No.', 'Inspector', 'Badge ID', 'Station', 'Contact', 'Status', 'Last Login'];
+    final columns = [
+      'Sr. No.',
+      'Inspector',
+      'Badge ID',
+      'Station',
+      'Contact',
+      'Status',
+      'Last Login',
+    ];
     final data = inspactors
         .map(
           (i) => {
@@ -98,7 +127,9 @@ class _InspactorsPageState extends State<InspactorsPage> {
             'Station': i.stationName ?? '-',
             'Contact': i.phone,
             'Status': i.isActive ? 'Active' : 'Inactive',
-            'Last Login': i.lastLogin == null ? '-' : '${i.lastLogin!.toDate().day.toString().padLeft(2, '0')}/${i.lastLogin!.toDate().month.toString().padLeft(2, '0')}/${i.lastLogin!.toDate().year}',
+            'Last Login': i.lastLogin == null
+                ? '-'
+                : '${i.lastLogin!.toDate().day.toString().padLeft(2, '0')}/${i.lastLogin!.toDate().month.toString().padLeft(2, '0')}/${i.lastLogin!.toDate().year}',
             '_model': i,
           },
         )
@@ -107,15 +138,19 @@ class _InspactorsPageState extends State<InspactorsPage> {
     return DataTableWidget(
       columns: columns,
       data: data,
-      titleDatatableText: 'All Inspectors',
-      subTitleDatatableText: 'List of all inspectors with their assignments',
+      titleDataTableText: 'All Inspectors',
+      subTitleDataTableText: 'List of all inspectors with their assignments',
       headerColor: appColors.primaryColor,
       headerColumnColor: appColors.textPrimaryColor,
       cellTextColor: appColors.primaryTextColor,
       rowActions: {
         RowAction(RowActionType.view, icon: Icons.remove_red_eye_outlined),
         RowAction(RowActionType.modify, icon: Icons.edit_outlined),
-        RowAction(RowActionType.execute, icon: Icons.power_settings_new, hoverMessage: 'Activate/Deactivate'),
+        RowAction(
+          RowActionType.execute,
+          icon: Icons.power_settings_new,
+          hoverMessage: 'Activate/Deactivate',
+        ),
         RowAction(RowActionType.delete, icon: Icons.delete_outlined),
       },
       onView: (row) {
@@ -126,13 +161,23 @@ class _InspactorsPageState extends State<InspactorsPage> {
         final i = row['_model'] as Inspector;
         final result = await showDialog(
           context: context,
-          builder: (context) => AddInspactorPage(
-            initialData: {'firstName': i.firstName, 'lastName': i.lastName, 'email': i.email, 'phone': i.phone, 'badgeId': i.badgeId, 'stationId': i.stationId, 'stationName': i.stationName},
+          builder: (context) => AddInspectorPage(
+            initialData: {
+              'firstName': i.firstName,
+              'lastName': i.lastName,
+              'email': i.email,
+              'phone': i.phone,
+              'badgeId': i.badgeId,
+              'stationId': i.stationId,
+              'stationName': i.stationName,
+            },
           ),
         );
-        if (result is Map && result['firstName'] != null && result['lastName'] != null) {
-          context.read<InspactorBloc>().add(
-            UpdateInspactorEvent(
+        if (result is Map &&
+            result['firstName'] != null &&
+            result['lastName'] != null) {
+          context.read<InspectorBloc>().add(
+            UpdateInspectorEvent(
               inspector: i,
               firstName: result['firstName'],
               lastName: result['lastName'],
@@ -147,11 +192,16 @@ class _InspactorsPageState extends State<InspactorsPage> {
       },
       onExecute: (row) {
         final i = row['_model'] as Inspector;
-        context.read<InspactorBloc>().add(ToggleActiveEvent(inspectorId: i.inspectorId ?? '', isActive: !i.isActive));
+        context.read<InspectorBloc>().add(
+          ToggleActiveEvent(
+            inspectorId: i.inspectorId ?? '',
+            isActive: !i.isActive,
+          ),
+        );
       },
       onDelete: (row) async {
         final i = row['_model'] as Inspector;
-        final shouldDelete = await AppCustomDialog.show<bool>(
+        await AppCustomDialog.show(
           context: context,
           icon: Icons.delete_outline,
           iconBackgroundColor: appColors.red,
@@ -160,22 +210,29 @@ class _InspactorsPageState extends State<InspactorsPage> {
           primaryButtonText: 'Delete',
           secondaryButtonText: 'Cancel',
           primaryButtonColor: appColors.red,
-          onPrimaryPressed: () => Navigator.of(context).pop(true),
+          onPrimaryPressed: () {
+            // Navigator.of(context).pop(true);
+            context.read<InspectorBloc>().add(
+              DeleteInspectorEvent(inspectorId: i.inspectorId ?? ''),
+            );
+          },
           onSecondaryPressed: () => Navigator.of(context).pop(false),
         );
-        if (shouldDelete == true) {
-          context.read<InspactorBloc>().add(DeleteInspactorEvent(inspectorId: i.inspectorId ?? ''));
-        }
       },
       actionColumnName: 'Actions',
     );
   }
 
   Future<void> _onAddInspactorTap() async {
-    final result = await showDialog(context: context, builder: (context) => const AddInspactorPage());
-    if (result is Map && result['firstName'] != null && result['lastName'] != null) {
-      context.read<InspactorBloc>().add(
-        AddInspactorEvent(
+    final result = await showDialog(
+      context: context,
+      builder: (context) => const AddInspectorPage(),
+    );
+    if (result is Map &&
+        result['firstName'] != null &&
+        result['lastName'] != null) {
+      context.read<InspectorBloc>().add(
+        AddInspectorEvent(
           firstName: result['firstName'],
           lastName: result['lastName'],
           email: result['email'],
@@ -191,7 +248,7 @@ class _InspactorsPageState extends State<InspactorsPage> {
   void _onViewInspactorTap(BuildContext context, Inspector inspector) {
     showDialog(
       context: context,
-      builder: (context) => InspactorViewPage(inspector: inspector),
+      builder: (context) => InspectorViewPage(inspector: inspector),
     );
   }
 }

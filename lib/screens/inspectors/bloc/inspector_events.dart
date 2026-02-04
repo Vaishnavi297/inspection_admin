@@ -1,10 +1,10 @@
-part of 'inspactor_bloc.dart';
+part of 'inspector_bloc.dart';
 
-abstract class InspactorEvent {}
+abstract class InspectorEvent {}
 
-class FetchInspactorsEvent extends InspactorEvent {}
+class FetchInspectorsEvent extends InspectorEvent {}
 
-class AddInspactorEvent extends InspactorEvent {
+class AddInspectorEvent extends InspectorEvent {
   final String firstName;
   final String lastName;
   final String email;
@@ -12,10 +12,18 @@ class AddInspactorEvent extends InspactorEvent {
   final String? badgeId;
   final String stationId;
   final String stationName;
-  AddInspactorEvent({required this.firstName, required this.lastName, required this.email, required this.phone, this.badgeId, required this.stationId, required this.stationName});
+  AddInspectorEvent({
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phone,
+    this.badgeId,
+    required this.stationId,
+    required this.stationName,
+  });
 }
 
-class UpdateInspactorEvent extends InspactorEvent {
+class UpdateInspectorEvent extends InspectorEvent {
   final Inspector inspector;
   final String firstName;
   final String lastName;
@@ -24,7 +32,7 @@ class UpdateInspactorEvent extends InspactorEvent {
   final String? badgeId;
   final String stationId;
   final String stationName;
-  UpdateInspactorEvent({
+  UpdateInspectorEvent({
     required this.inspector,
     required this.firstName,
     required this.lastName,
@@ -36,12 +44,12 @@ class UpdateInspactorEvent extends InspactorEvent {
   });
 }
 
-class DeleteInspactorEvent extends InspactorEvent {
+class DeleteInspectorEvent extends InspectorEvent {
   final String inspectorId;
-  DeleteInspactorEvent({required this.inspectorId});
+  DeleteInspectorEvent({required this.inspectorId});
 }
 
-class ToggleActiveEvent extends InspactorEvent {
+class ToggleActiveEvent extends InspectorEvent {
   final String inspectorId;
   final bool isActive;
   ToggleActiveEvent({required this.inspectorId, required this.isActive});

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../screens/county/bloc/county_bloc.dart';
-import '../screens/inspaction_station/bloc/inspaction_station_bloc.dart';
+import '../screens/inspection_station/bloc/inspection_station_bloc.dart';
 import '../screens/inspections/bloc/inspection_bloc.dart';
 import './../screens/auth/cubit/login_password_visibility_cubit.dart';
 
@@ -13,7 +13,7 @@ List<BlocProvider> getAllBlocProviders() {
 
     BlocProvider(create: (context) => SignInBloc()),
 
-    BlocProvider(create: (context) => InspactionStationBloc()),
+    BlocProvider(create: (context) => InspectionStationBloc()),
     BlocProvider(create: (context) => CountyBloc()),
     BlocProvider(create: (context) => InspectionBloc()),
   ];

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:inspection_station/components/app_text_style/app_text_style.dart';
 
 import '../../utils/constants/app_dimension.dart';

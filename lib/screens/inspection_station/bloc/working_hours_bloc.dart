@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/data_structure/models/inspaction_station.dart';
+import '../../../data/data_structure/models/inspection_station.dart';
 
 class WorkingHoursState extends Equatable {
   final Set<String> selectedDays;
