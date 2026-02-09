@@ -16,11 +16,8 @@ import '../../../utils/routes/app_routes.dart';
 class SidebarComponent extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int>? onSelect;
-  const SidebarComponent({
-    super.key,
-    required this.currentIndex,
-    this.onSelect,
-  });
+
+  const SidebarComponent({super.key, required this.currentIndex, this.onSelect});
 
   @override
   State<SidebarComponent> createState() => _SidebarComponentState();
@@ -28,6 +25,7 @@ class SidebarComponent extends StatefulWidget {
 
 class _SidebarComponentState extends State<SidebarComponent> {
   final adminRepo = AdminRepository.instance;
+
   @override
   void initState() {
     super.initState();
@@ -65,19 +63,10 @@ class _SidebarComponentState extends State<SidebarComponent> {
                   : EdgeInsets.only(left: 8, right: 16),
               title: ResponsiveWidget.isMediumScreen(context)
                   ? null
-                  : Text(
-                      appStrings.lblAppName,
-                      style: boldTextStyle(
-                        size: 20,
-                        color: appColors.primaryColor,
-                      ),
-                    ),
+                  : Text(appStrings.lblAppName, style: boldTextStyle(size: 20, color: appColors.primaryColor)),
               subtitle: ResponsiveWidget.isMediumScreen(context)
                   ? null
-                  : Text(
-                      adminRepo.adminData?.email ?? '',
-                      style: secondaryTextStyle(size: 12),
-                    ),
+                  : Text(adminRepo.adminData?.email ?? '', style: secondaryTextStyle(size: 12)),
               trailing: ResponsiveWidget.isMediumScreen(context)
                   ? null
                   : ImageIcon(AssetImage(AppAssets.imgCloseDrawer), size: 24),
@@ -88,43 +77,14 @@ class _SidebarComponentState extends State<SidebarComponent> {
             Expanded(
               child: ListView(
                 children: [
-                  navItemWidget(
-                    title: 'Dashboard',
-                    icon: Icons.space_dashboard,
-                    index: 0,
-                    isTrailingIcon: false,
-                  ),
-                  navItemWidget(
-                    title: 'County',
-                    icon: Icons.map_outlined,
-                    index: 1,
-                  ),
-                  navItemWidget(
-                    title: 'Stations',
-                    icon: Icons.home_work_outlined,
-                    index: 2,
-                  ),
-                  navItemWidget(
-                    title: 'Inspactors',
-                    icon: Icons.badge_outlined,
-                    index: 3,
-                  ),
-                  navItemWidget(
-                    title: 'Users',
-                    icon: Icons.people_outline,
-                    index: 4,
-                  ),
-                  navItemWidget(
-                    title: 'Vehicles',
-                    icon: Icons.directions_car_outlined,
-                    index: 5,
-                  ),
-                  navItemWidget(
-                    title: 'Inspections',
-                    icon: Icons.fact_check_outlined,
-                    index: 6,
-                  ),
-                  navItemWidget(title: 'States', icon: Icons.map, index: 7),
+                  navItemWidget(title: 'Dashboard', icon: Icons.space_dashboard, index: 0, isTrailingIcon: false),
+                  navItemWidget(title: 'County', icon: Icons.map_outlined, index: 1),
+                  navItemWidget(title: 'States', icon: Icons.map, index: 2),
+                  navItemWidget(title: 'Stations', icon: Icons.home_work_outlined, index: 3),
+                  navItemWidget(title: 'Inspectors', icon: Icons.badge_outlined, index: 4),
+                  navItemWidget(title: 'Users', icon: Icons.people_outline, index: 5),
+                  navItemWidget(title: 'Vehicles', icon: Icons.directions_car_outlined, index: 6),
+                  navItemWidget(title: 'Inspections', icon: Icons.fact_check_outlined, index: 7),
                 ],
               ),
             ),
@@ -145,25 +105,15 @@ class _SidebarComponentState extends State<SidebarComponent> {
               leading: CircleAvatar(
                 radius: 18,
                 backgroundColor: appColors.primaryColor,
-                child: Icon(
-                  Icons.person_outline,
-                  size: 20,
-                  color: Colors.white,
-                ),
+                child: Icon(Icons.person_outline, size: 20, color: Colors.white),
               ),
 
               title: ResponsiveWidget.isMediumScreen(context)
                   ? null
-                  : Text(
-                      adminRepo.adminData?.name ?? appStrings.lblUserName,
-                      style: boldTextStyle(size: 14),
-                    ),
+                  : Text(adminRepo.adminData?.name ?? appStrings.lblUserName, style: boldTextStyle(size: 14)),
               subtitle: ResponsiveWidget.isMediumScreen(context)
                   ? null
-                  : Text(
-                      adminRepo.adminData?.role ?? appStrings.lblEmail,
-                      style: secondaryTextStyle(size: 12),
-                    ),
+                  : Text(adminRepo.adminData?.role ?? appStrings.lblEmail, style: secondaryTextStyle(size: 12)),
             ),
           ],
         ),
@@ -181,17 +131,12 @@ class _SidebarComponentState extends State<SidebarComponent> {
   }) {
     final selected = widget.currentIndex == index;
     final bg = selected ? appColors.primaryColor : Colors.transparent;
-    final iconColor =
-        color ?? (selected ? appColors.white : appColors.textSecondaryColor);
-    final textColor =
-        color ?? (selected ? appColors.white : appColors.textPrimaryColor);
+    final iconColor = color ?? (selected ? appColors.white : appColors.textSecondaryColor);
+    final textColor = color ?? (selected ? appColors.white : appColors.textPrimaryColor);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(appConstants.defaultRadius),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(appConstants.defaultRadius)),
       child: ListTile(
         dense: true,
         leading: SizedBox(
@@ -204,26 +149,16 @@ class _SidebarComponentState extends State<SidebarComponent> {
             ? null
             : Text(
                 title,
-                style: primaryTextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: primaryTextStyle(color: textColor, fontWeight: FontWeight.w500),
               ),
         trailing: ResponsiveWidget.isMediumScreen(context)
             ? null
             : isTrailingIcon == true
-            ? trailing ??
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: color,
-                    size: s.s18,
-                  )
+            ? trailing ?? Icon(Icons.arrow_forward_ios_rounded, color: color, size: s.s18)
             : null,
         onTap: index == 8
             ? () async {
-                final shouldLogout = await LogoutConfirmationDialog.show(
-                  context,
-                );
+                final shouldLogout = await LogoutConfirmationDialog.show(context);
 
                 if (shouldLogout == true) {
                   await LocalStorageService.instance.clearAllLocal();
@@ -243,22 +178,22 @@ class _SidebarComponentState extends State<SidebarComponent> {
                     route = AppRoutes.county;
                     break;
                   case 2:
-                    route = AppRoutes.stations;
+                    route = AppRoutes.states;
                     break;
                   case 3:
-                    route = AppRoutes.inspectors;
+                    route = AppRoutes.stations;
                     break;
                   case 4:
-                    route = AppRoutes.users;
+                    route = AppRoutes.inspectors;
                     break;
                   case 5:
-                    route = AppRoutes.vehicles;
+                    route = AppRoutes.users;
                     break;
                   case 6:
-                    route = AppRoutes.inspections;
+                    route = AppRoutes.vehicles;
                     break;
                   case 7:
-                    route = AppRoutes.states;
+                    route = AppRoutes.inspections;
                     break;
                 }
                 if (GoRouterState.of(context).uri.path != route) {

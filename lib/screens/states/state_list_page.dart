@@ -145,6 +145,9 @@ class _StateListPageState extends State<StateListPage> {
       columns: const ['Sr.No', 'Name', 'Code'],
       data: data,
       actionColumnName: 'Actions',
+      headerColor: appColors.primaryColor,
+      headerColumnColor: appColors.textPrimaryColor,
+      cellTextColor: appColors.primaryTextColor,
       rowActions: {
         RowAction(RowActionType.modify, icon: Icons.edit_outlined),
         RowAction(RowActionType.delete, icon: Icons.delete_outlined),
